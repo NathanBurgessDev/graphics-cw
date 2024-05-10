@@ -4,6 +4,7 @@
 #include <errno.h>
 
 #include <vector>
+#include <optional>
 
 using namespace std;
 
@@ -121,7 +122,7 @@ int mtl_parse(char* filename, vector<Material>* mtls)
 		return 0;
 	}
 
-	Material currentMaterial;
+	std::optional<Material> currentMaterial;
 
 	while (1) {
 		char lineHeader[256];
@@ -135,7 +136,7 @@ int mtl_parse(char* filename, vector<Material>* mtls)
 		// Object and set the material name
 		if (strcmp(lineHeader, "newmtl") == 0) {
 			currentMaterial = Material();
-			fscanf(file, "%s\n", currentMaterial.mtl_name);
+			fscanf(file, "%s\n", currentMaterial->mtl_name);
 		}
 
 		// When given a file name for the material we need to set the current
@@ -156,9 +157,9 @@ int mtl_parse(char* filename, vector<Material>* mtls)
 			strcat(mtlFilePath, mtlFileName);
 
 			// Copy the filePath into the fil_name
-			strcpy(currentMaterial.fil_name, mtlFilePath);
+			strcpy(currentMaterial->fil_name, mtlFilePath);
 
-			mtls->push_back(currentMaterial);
+			mtls->push_back(currentMaterial.value());
 		}
 	}
 
@@ -187,10 +188,9 @@ int obj_parse(const char* filename, vector<Object>* objs)
 	// For each "usemtl" we need to build a new object
 	// When we encounter a new "usemtl" we need to store the current object
 	// and begin building a new one
-	Object currentObject;
-	currentObject.VBO = (int)objs->size();
-	currentObject.VAO = (int)objs->size();
-	bool firstObject = true;
+	std::optional<Object> currentObject;
+	currentObject->VBO = (int)objs->size();
+	currentObject->VAO = (int)objs->size();
 
 	// Open the file and error out if reading fails
 	FILE* file = fopen(filename, "r");
@@ -209,8 +209,8 @@ int obj_parse(const char* filename, vector<Object>* objs)
 		int endOfFile = fscanf(file, "%s", lineHeader);
 		if (endOfFile == EOF) {
 			// put last object on vector *objs
-			if (!firstObject) {
-				objs->push_back(currentObject);
+			if (currentObject) {
+				objs->push_back(currentObject.value());
 			}
 			break;
 		}
@@ -250,13 +250,13 @@ int obj_parse(const char* filename, vector<Object>* objs)
 		// (we use a flag for this as *optional* is not available in this version of C++)
 		// If there is an object is progress we push that to the objects vector and begin a new object
 		else if (strcmp(lineHeader, "usemtl") == 0) {
-			if (!firstObject) {
-				objs->push_back(currentObject);
+			if (currentObject) {
+				objs->push_back(currentObject.value());
 				currentObject = Object();
-				currentObject.VAO = (int)objs->size();
-				currentObject.VBO = (int)objs->size();
+				currentObject->VAO = (int)objs->size();
+				currentObject->VBO = (int)objs->size();
 			}
-			firstObject = false;
+		
 
 			// We then read in the materialName and check for the name within our *materials* vector
 			// to set our objects material to the material with the same name
@@ -265,7 +265,7 @@ int obj_parse(const char* filename, vector<Object>* objs)
 
 			for (Material material : materials) {
 				if (strcmp(material.mtl_name, materialName) == 0) {
-					currentObject.mtl = material;
+					currentObject->mtl = material;
 				}
 			}
 		}
@@ -306,7 +306,7 @@ int obj_parse(const char* filename, vector<Object>* objs)
 			}
 
 			// We then push the vertex onto the current object we are building 
-			currentObject.tris.push_back(tri);
+			currentObject->tris.push_back(tri);
 
 		}
 
