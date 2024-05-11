@@ -1,108 +1,34 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
+#pragma once
 
-#include <vector>
-#include <optional>
+#include "obj.h"
 
-using namespace std;
+void Object::renderObject(unsigned int shaderProgram) {
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindVertexArray(VAO);
+	
+	model = glm::scale((model), glm::vec3(.005f, .005f, .005f));
 
-class vec3
-{
-public:
-	float x, y, z;
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
-	vec3() {}
-	vec3(float l, float m, float r)
-	{
-		x = l;
-		y = m;
-		z = r;
-	}
-	~vec3() {}
-};
+	glDrawArrays(GL_TRIANGLES, 0, (tris.size() * 3));
+}
 
-class vec2
-{
-public:
-	float x, y;
+ void Object::setupTextureAndVAO() {
+	texture = CreateTexture(mtl.fil_name);
 
-	vec2() {}
-	vec2(float l, float r)
-	{
-		x = l;
-		y = r;
-	}
-	~vec2() {}
-};
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
 
-struct vertex
-{
-public:
-	vec3 vc;
-	vec3 tc;
-
-	vertex() {}
-	vertex(vec3 vc_in, vec3 tc_in)
-	{
-		vc = vc_in;
-		tc = tc_in;
-	}
-	~vertex() {}
-};
-struct triangle
-{
-public:
-	vertex verts[3];
-
-	triangle() {}
-	triangle(vertex v0, vertex v1, vertex v2)
-	{
-		verts[0] = v0;
-		verts[1] = v1;
-		verts[2] = v2;
-	}
-	~triangle() {}
-};
-
-class Material
-{
-public:
-	char mtl_name[256];
-	char fil_name[256];
-
-	Material() {}
-	Material(char* n, char* f)
-	{
-		strcpy(mtl_name, n);
-		strcpy(fil_name, f);
-	}
-	~Material()
-	{
-	}
-};
-
-class Object
-{
-public:
-	unsigned int VAO;
-	unsigned int VBO;
-	vector<triangle> tris;
-	Material mtl;
-	GLuint texture;
-
-
-	Object() {}
-	Object(Material m)
-	{
-		strcpy(mtl.fil_name, m.fil_name);
-		strcpy(mtl.mtl_name, m.mtl_name);
-	}
-	~Object()
-	{
-	}
-};
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (tris.size() * 18), tris.data(), GL_STATIC_DRAW);
+ 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	/*glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(3);*/
+}
 
 int mtl_parse(char* filename, vector<Material>* mtls)
 {
@@ -169,12 +95,13 @@ int mtl_parse(char* filename, vector<Material>* mtls)
 
 
 int obj_parse(const char* filename, vector<Object>* objs)
-{
+ {
 	// Stores the values parsed before reaching the first "usemtl"
 	// So we can index them later
 	vector<Material> materials;
 	vector<vec3> vecs;
 	vector<vec2> uvs;
+	vector<vec3> normals;
 
 	// The provided file name is given as filename = "obj/FILE/file.obj"
 	// As a result when we put the material destination into *objs
@@ -189,8 +116,6 @@ int obj_parse(const char* filename, vector<Object>* objs)
 	// When we encounter a new "usemtl" we need to store the current object
 	// and begin building a new one
 	std::optional<Object> currentObject;
-	currentObject->VBO = (int)objs->size();
-	currentObject->VAO = (int)objs->size();
 
 	// Open the file and error out if reading fails
 	FILE* file = fopen(filename, "r");
@@ -200,7 +125,7 @@ int obj_parse(const char* filename, vector<Object>* objs)
 	}
 
 	while (1) {
-		
+
 		// The keyword at the start of each line
 		char lineHeader[256];
 
@@ -231,6 +156,13 @@ int obj_parse(const char* filename, vector<Object>* objs)
 			uvs.push_back(uv);
 		}
 
+		// Checks for a vertex normal "vn"
+		else if (strcmp(lineHeader, "vn") == 0) {
+			vec3 normal;
+			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
+			normals.push_back(normal);
+		}
+
 		// Checks for the name of an associated MTL file
 		// Takes the leading file path provided i.e. "obj/FILE/"
 		// and pre-pends it to the fileName provided within the .obj file
@@ -241,7 +173,7 @@ int obj_parse(const char* filename, vector<Object>* objs)
 			char mtlFilePath[256];
 			strcpy(mtlFilePath, filePath.c_str());
 			fscanf(file, "%s", mtlFileName);
-			mtl_parse(strcat(mtlFilePath,mtlFileName), &materials);
+			mtl_parse(strcat(mtlFilePath, mtlFileName), &materials);
 		}
 
 
@@ -253,10 +185,11 @@ int obj_parse(const char* filename, vector<Object>* objs)
 			if (currentObject) {
 				objs->push_back(currentObject.value());
 				currentObject = Object();
-				currentObject->VAO = (int)objs->size();
-				currentObject->VBO = (int)objs->size();
 			}
-		
+			else {
+				currentObject = Object();
+			}
+
 
 			// We then read in the materialName and check for the name within our *materials* vector
 			// to set our objects material to the material with the same name
@@ -274,9 +207,9 @@ int obj_parse(const char* filename, vector<Object>* objs)
 		else if (strcmp(lineHeader, "f") == 0) {
 
 			// The values after f provide the index of the provided vertecies and uv values
-			unsigned int vertexIndex[3], uvIndex[3], wastedNormals[3];
+			unsigned int vertexIndex[3], uvIndex[3], normalsIndex[3];
 
-			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &wastedNormals[0], &vertexIndex[1], &uvIndex[1], &wastedNormals[1], &vertexIndex[2], &uvIndex[2], &wastedNormals[2]);
+			int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalsIndex[0], &vertexIndex[1], &uvIndex[1], &normalsIndex[1], &vertexIndex[2], &uvIndex[2], &normalsIndex[2]);
 
 			// check to see if we have recieved the correct amount of values
 			if (matches != 9) {
@@ -293,6 +226,7 @@ int obj_parse(const char* filename, vector<Object>* objs)
 			for (int i = 0; i < 3; i++) {
 				unsigned int indexOfVertex = vertexIndex[i];
 				unsigned int indexOfUv = uvIndex[i];
+				unsigned int indexOfNormal = normalsIndex[i];
 
 				tri.verts[i].vc = vecs[indexOfVertex - 1];
 
@@ -303,6 +237,8 @@ int obj_parse(const char* filename, vector<Object>* objs)
 				float textureCoordY = -uvs[indexOfUv - 1].y;
 
 				tri.verts[i].tc = vec3(textureCoordX, textureCoordY, 0);
+
+				//tri.verts[i].nc = normals[indexOfNormal - 1];
 			}
 
 			// We then push the vertex onto the current object we are building 
