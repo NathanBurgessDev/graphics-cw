@@ -202,7 +202,8 @@ int main()
 	MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), cam_dist, 0.f, 0.f);
 
 	vector<CompleteObject> objs;
-	
+	glEnable(GL_DEPTH_TEST);
+
  	objs.push_back(CompleteObject("objs/white_oak/white_oak.obj"));
 
 	setupFloor();
@@ -210,9 +211,12 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+
+
 
 
 
@@ -235,16 +239,9 @@ int main()
 
 		glm::mat4 view = glm::mat4(1.f);
 		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
-		glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		glm::mat4 projection = glm::mat4(1.f);
 		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
-		glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
-
-		for (CompleteObject object : objs) {
-			object.renderFullObject(textureShaderProgram);
-		}
 
 
 		glUseProgram(basicShaderProgram);
@@ -255,9 +252,20 @@ int main()
 
 
 		drawFloor(basicShaderProgram);
-		
-		
 
+		glUseProgram(textureShaderProgram);
+
+		glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+	
+		for (CompleteObject object : objs) {
+			object.renderFullObject(textureShaderProgram);
+		}
+
+
+		
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
