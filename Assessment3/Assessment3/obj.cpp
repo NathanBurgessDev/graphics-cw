@@ -21,6 +21,7 @@ void Object::renderObject(unsigned int shaderProgram) {
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (tris.size() * 18), tris.data(), GL_STATIC_DRAW);
  	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -234,7 +235,7 @@ int obj_parse(const char* filename, vector<Object>* objs)
 				// usually 0,0 as top left in i.e. screen space
 				// so we have to flip the y to read the texture correctly
 				float textureCoordX = uvs[indexOfUv - 1].x;
-				float textureCoordY = -uvs[indexOfUv - 1].y;
+				float textureCoordY = uvs[indexOfUv - 1].y;
 
 				tri.verts[i].tc = vec3(textureCoordX, textureCoordY, 0);
 

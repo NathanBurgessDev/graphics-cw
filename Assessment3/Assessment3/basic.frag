@@ -3,6 +3,7 @@
 layout (location = 0) out vec4 fColour;
 
 in vec3 col;
+in vec3 nor;
 
 void main()
 {
