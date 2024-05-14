@@ -9,7 +9,7 @@ CompleteObject::CompleteObject(const char* filename) {
 }
 
 void CompleteObject::renderFullObject(unsigned int shaderProgram) {
-	for (Object obj : objs) {
-		obj.renderObject(shaderProgram);
+	for (Object& obj : objs) {
+		obj.renderObject(shaderProgram);		
 	}
 }

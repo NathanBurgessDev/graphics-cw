@@ -85,7 +85,7 @@ void setupFloor() {
 	glGenBuffers(1, &floorVBO);
 
 	glBindVertexArray(floorVAO);
-	glBindBuffer(GL_ARRAY_BUFFER,floorVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -174,7 +174,7 @@ void drawFloor(unsigned int shaderProgram)
 	model = glm::translate(model, glm::vec3(0, -3, 0));
 	model = glm::scale(model, glm::vec3(100, 0.1, 100));
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
- 	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 
@@ -183,17 +183,18 @@ int main()
 	glfwInit();
 
 	// Setup window + callbacks
-	GLFWwindow* window = glfwCreateWindow(width,height, "Assesment 3", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "Assesment 3", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, SizeCallback);
 
 	gl3wInit();
+	glfwSwapInterval(0);
 
 	// Debugging
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(DebugCallback, 0);
 
-	unsigned int textureShaderProgram = CompileShader("textured.vert", "textured.frag");
+	GLuint textureShaderProgram = CompileShader("textured.vert", "textured.frag");
 	GLuint basicShaderProgram = CompileShader("basic.vert", "basic.frag");
 
 
@@ -204,38 +205,53 @@ int main()
 	vector<CompleteObject> objs;
 	glEnable(GL_DEPTH_TEST);
 
- 	objs.push_back(CompleteObject("objs/white_oak/white_oak.obj"));
+	objs.push_back(CompleteObject("objs/white_oak/white_oak.obj"));
 
-	setupFloor();
+	
+	//setupFloor();
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-
-
-
-
+	double prevTime = 0.0;
+	double currentTime = 0.0;
+	double timeDiff;
+	unsigned int counter = 0;
 
 
 	//glEnable(GL_DEPTH_TEST);
 
-	
 
-	
+	//glUseProgram(textureShaderProgram);
+
 	while (!glfwWindowShouldClose(window))
 	{
-		processKeyboard(window);
 
-		glClearColor(.8f, .8f, .8f, .1f);
+		currentTime = glfwGetTime();
+		timeDiff = currentTime - prevTime;
+		counter++;
+		if (timeDiff >= 1.0 / 30.0) {
+			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+			std:string ms = std::to_string((timeDiff / counter) * 1000);
+			std::string newTitle = "Assesment3 - " + FPS + "FPS / " + ms + "ms";
+			glfwSetWindowTitle(window, newTitle.c_str());
+			prevTime = currentTime;
+			counter = 0;
+			//std::cout << newTitle << std::endl;
+
+		}
+
+		
+
+		glClearColor(.8f, .8f, .8f, 1.f);
 		//glClearColor(1.f,1.f,1.f,1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		glUseProgram(textureShaderProgram);
 
 		glm::mat4 view = glm::mat4(1.f);
 		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
@@ -244,30 +260,26 @@ int main()
 		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 
 
-		glUseProgram(basicShaderProgram);
-
+		/*glUseProgram(basicShaderProgram);
 		glUniformMatrix4fv(glGetUniformLocation(basicShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
 		glUniformMatrix4fv(glGetUniformLocation(basicShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		drawFloor(basicShaderProgram);*/
 
-
-		drawFloor(basicShaderProgram);
+		
 
 		glUseProgram(textureShaderProgram);
-
 		glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-	
-		for (CompleteObject object : objs) {
+
+		for (CompleteObject& object : objs) {
 			object.renderFullObject(textureShaderProgram);
 		}
 
 
-		
-		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		processKeyboard(window);
 	}
 	glfwDestroyWindow(window);
 	glfwTerminate();

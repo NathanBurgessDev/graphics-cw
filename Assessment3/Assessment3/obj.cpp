@@ -5,7 +5,8 @@
 void Object::renderObject(unsigned int shaderProgram) {
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
-	
+
+	model = glm::mat4(1.f);
 	model = glm::scale((model), glm::vec3(.005f, .005f, .005f));
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
