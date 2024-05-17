@@ -6,10 +6,7 @@ void Object::renderObject(unsigned int shaderProgram) {
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
 
-	model = glm::mat4(1.f);
-	model = glm::scale((model), glm::vec3(.005f, .005f, .005f));
-
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(*model));
 
 	glDrawArrays(GL_TRIANGLES, 0, (tris.size() * 3));
 }
@@ -23,13 +20,13 @@ void Object::renderObject(unsigned int shaderProgram) {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (tris.size() * 18), tris.data(), GL_STATIC_DRAW);
- 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (tris.size() * 27), tris.data(), GL_STATIC_DRAW);
+ 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	/*glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(3);*/
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 }
 
 int mtl_parse(char* filename, vector<Material>* mtls)
@@ -96,7 +93,7 @@ int mtl_parse(char* filename, vector<Material>* mtls)
 }
 
 
-int obj_parse(const char* filename, vector<Object>* objs)
+int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::mat4> model)
  {
 	// Stores the values parsed before reaching the first "usemtl"
 	// So we can index them later
@@ -186,10 +183,10 @@ int obj_parse(const char* filename, vector<Object>* objs)
 		else if (strcmp(lineHeader, "usemtl") == 0) {
 			if (currentObject) {
 				objs->push_back(currentObject.value());
-				currentObject = Object();
+				currentObject = Object(model);
 			}
 			else {
-				currentObject = Object();
+				currentObject = Object(model);
 			}
 
 
@@ -240,13 +237,16 @@ int obj_parse(const char* filename, vector<Object>* objs)
 
 				tri.verts[i].tc = vec3(textureCoordX, textureCoordY, 0);
 
-				//tri.verts[i].nc = normals[indexOfNormal - 1];
+				tri.verts[i].nc = normals[indexOfNormal - 1];
 			}
+
+
 
 			// We then push the vertex onto the current object we are building 
 			currentObject->tris.push_back(tri);
 
 		}
+		
 
 	}
 

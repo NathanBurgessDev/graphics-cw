@@ -13,8 +13,9 @@
 
 #include <vector>
 #include <optional>
-
+#include <memory>
 #include <string>
+#include <iostream>
 
 #include "texture.h"
 
@@ -54,14 +55,14 @@ struct vertex
 public:
 	vec3 vc;
 	vec3 tc;
-	//vec3 nc;
+	vec3 nc;
 
 	vertex() {}
 	vertex(vec3 vc_in, vec3 tc_in, vec3 nc_in)
 	{
 		vc = vc_in;
 		tc = tc_in;
-		//nc = nc_in;
+		nc = nc_in;
 	}
 	~vertex() {}
 };
@@ -105,10 +106,13 @@ public:
 	vector<triangle> tris;
 	Material mtl;
 	GLuint texture;
-	glm::mat4 model = glm::mat4(1.f);
+	std::shared_ptr<glm::mat4> model;
+	GLuint programType;
 
 
-	Object() {}
+	Object(std::shared_ptr<glm::mat4> modelIn) {
+		model = modelIn;
+	}
 	Object(Material m)
 	{
 		strcpy(mtl.fil_name, m.fil_name);
@@ -123,5 +127,5 @@ public:
 
 int mtl_parse(char* filename, vector<Material>* mtls);
 
-int obj_parse(const char* filename, vector<Object>* objs);
+int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::mat4> model);
 

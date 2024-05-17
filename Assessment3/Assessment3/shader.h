@@ -2,7 +2,7 @@
 #include "file.h"
 
 GLuint CompileShader(const char* vsFilename, const char* fsFilename)
-{
+  {
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	char* vertexShaderSource = read_file(vsFilename);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);

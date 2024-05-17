@@ -25,9 +25,6 @@ struct SCamera
 
 	const float MovementSpeed = .5f;
 	float MouseSensitivity = 1.f;
-
-
-
 };
 
 
