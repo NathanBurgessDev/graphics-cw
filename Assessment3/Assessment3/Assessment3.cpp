@@ -109,13 +109,15 @@ int main()
 {
 	glfwInit();
 
+
+	glfwWindowHint(GLFW_SAMPLES, 32);
 	// Setup window + callbacks
 	GLFWwindow* window = glfwCreateWindow(width, height, "Assesment 3", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, SizeCallback);
 
 	gl3wInit();
-	glfwSwapInterval(1);
+ 	glfwSwapInterval(1);
 
 	// Debugging
 	glEnable(GL_DEBUG_OUTPUT);
