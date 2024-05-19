@@ -22,6 +22,12 @@ void CompleteObject::renderFullObject() {
 	}
 }
 
+void CompleteObject::renderFullObjectWithShader(GLuint newShaderProgram){
+	for (Object& obj : objs) {
+		obj.renderObject(newShaderProgram);
+	}
+}
+
 void CompleteObject::translate(float x, float y, float z) {
 	*model = glm::translate((*model), glm::vec3(x, y, z));
 }

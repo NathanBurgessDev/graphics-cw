@@ -17,6 +17,7 @@ public:
 	//CompleteObject(std::vector<float>& verticies, std::string fileName);
 
 	void renderFullObject();
+	void renderFullObjectWithShader(GLuint newShaderProgram);
 
 	void translate(float x, float y, float z);
 

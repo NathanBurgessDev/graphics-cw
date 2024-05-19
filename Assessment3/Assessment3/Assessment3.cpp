@@ -19,7 +19,7 @@ using namespace std;
 #include "CompleteObject.h"
 #include "shadow.h"
 #include "Terrain.h"
-//#include "ShadowRendering.h"
+#include "ShadowRendering.h"
 
 
 
