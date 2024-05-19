@@ -34,78 +34,6 @@ SCamera Camera;
 glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
 glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
 
-std::vector<float> vertices =
-{
-	//back face
-	//pos					//col				//normal
-	-0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, 0.f, -1.f,
-	0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, 0.f, -1.f,
-	0.5f,  0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, 0.f, -1.f,
-	0.5f,  0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, 0.f, -1.f,
-	-0.5f,  0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, 0.f, -1.f,
-	-0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, 0.f, -1.f,
-
-	//front face
-	-0.5f, -0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 0.f, 0.f, 1.f,
-	0.5f, -0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 0.f, 0.f, 1.f,
-	0.5f,  0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 0.f, 0.f, 1.f,
-	0.5f,  0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 0.f, 0.f, 1.f,
-	-0.5f,  0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 0.f, 0.f, 1.f,
-	-0.5f, -0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 0.f, 0.f, 1.f,
-
-	//left face
-	-0.5f,  0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 -1.f, 0.f, 0.f,
-	-0.5f,  0.5f, -0.5f,  	1.0f, 1.0f, 1.0f,	 -1.f, 0.f, 0.f,
-	-0.5f, -0.5f, -0.5f,  	1.0f, 1.0f, 1.0f,	 -1.f, 0.f, 0.f,
-	-0.5f, -0.5f, -0.5f,  	1.0f, 1.0f, 1.0f,	 -1.f, 0.f, 0.f,
-	-0.5f, -0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 -1.f, 0.f, 0.f,
-	-0.5f,  0.5f,  0.5f,  	1.0f, 1.0f, 1.0f,	 -1.f, 0.f, 0.f,
-
-	//right face
-	0.5f,  0.5f,  0.5f,  	1.f, 1.0f, 1.0f,	 1.f, 0.f, 0.f,
-	0.5f,  0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 1.f, 0.f, 0.f,
-	0.5f, -0.5f, -0.5f, 	1.f, 1.0f, 1.0f,	 1.f, 0.f, 0.f,
-	0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 1.f, 0.f, 0.f,
-	0.5f, -0.5f,  0.5f,  	1.f, 1.0f, 1.0f,	 1.f, 0.f, 0.f,
-	0.5f,  0.5f,  0.5f,  	1.f, 1.0f, 1.0f,	 1.f, 0.f, 0.f,
-
-	//bottom face
-	-0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, -1.f, 0.f,
-	0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, -1.f, 0.f,
-	0.5f, -0.5f,  0.5f,  	1.f, 1.0f, 1.0f,	 0.f, -1.f, 0.f,
-	0.5f, -0.5f,  0.5f,  	1.f, 1.0f, 1.0f,	 0.f, -1.f, 0.f,
-	-0.5f, -0.5f,  0.5f,  	1.f, 1.0f, 1.0f,	 0.f, -1.f, 0.f,
-	-0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 1.0f,	 0.f, -1.f, 0.f,
-
-	//top face
-	-0.5f,  0.5f, -0.5f,  	1.0f, 1.f, 1.0f,	0.f, 1.f, 0.f,
-	0.5f,  0.5f, -0.5f,  	1.0f, 1.f, 1.0f,	0.f, 1.f, 0.f,
-	0.5f,  0.5f,  0.5f,  	1.0f, 1.f, 1.0f,	0.f, 1.f, 0.f,
-	0.5f,  0.5f,  0.5f,  	1.0f, 1.f, 1.0f,	0.f, 1.f, 0.f,
-	-0.5f,  0.5f,  0.5f,  	1.0f, 1.f, 1.0f,	0.f, 1.f, 0.f,
-	-0.5f,  0.5f, -0.5f, 	1.0f, 1.f, 1.0f,	0.f, 1.f, 0.f,
-};
-
-
-void setupFloor() {
-
-	glGenVertexArrays(1, &floorVAO);
-	glGenBuffers(1, &floorVBO);
-
-	glBindVertexArray(floorVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices.data()), vertices.data(), GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (9 * sizeof(float)), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, (9 * sizeof(float)), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, (9 * sizeof(float)), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0);
-}
 
 
 void SizeCallback(GLFWwindow* window, int w, int h)
@@ -153,13 +81,13 @@ void processKeyboard(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
-		cam_dist -= 0.1;
+		Camera.cam_dist -= 0.1;
 		camChanged = true;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
-		cam_dist += 0.1;
+		Camera.cam_dist += 0.1;
 		camChanged = true;
 	}
 
@@ -171,21 +99,10 @@ void processKeyboard(GLFWwindow* window)
 
 	if (camChanged)
 	{
-		MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), cam_dist, xOffset, yOffset);
+		MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), Camera.cam_dist, xOffset, yOffset);
 	}
 }
 
-void drawFloor(unsigned int shaderProgram)
-{
-	glBindVertexArray(floorVAO);
-
-	// floor
-	glm::mat4 model = glm::mat4(1.f);
-	model = glm::translate(model, glm::vec3(0, -3, 0));
-	model = glm::scale(model, glm::vec3(100, 0.1, 100));
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-}
 
 
 int main()
@@ -214,25 +131,24 @@ int main()
 
 
 	InitCamera(Camera);
-	cam_dist = 5.f;
-	MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), cam_dist, 0.f, 0.f);
+	Camera.cam_dist = 5.f;
+	MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), Camera.cam_dist, 0.f, 0.f);
 
 	vector<CompleteObject> objs;
 	glEnable(GL_DEPTH_TEST);
 
 	CompleteObject tree0 = CompleteObject(phongProgram,"objs/white_oak/white_oak.obj");
-	tree0.scale(0.005, 0.005, 0.005);
+	tree0.scale(0.005f, 0.005f, 0.005f);
 
 	CompleteObject tree1 = CompleteObject(phongProgram,"objs/white_oak/white_oak.obj");
-	tree1.translate(5.0, 0.0, 0.0);
-	tree1.scale(0.005, 0.005, 0.005);
+	tree1.translate(5.0f, 0.0f, 0.0f);
+	tree1.scale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
-	Terrain ground = Terrain(phongProgram, 8, 8, 64);
-
+	Terrain ground = Terrain(phongProgram, 20,20, 40,10);
 	
 	
-	objs.push_back(tree0);
+ 	objs.push_back(tree0);
 	objs.push_back(tree1);
 	objs.push_back(ground);
 
@@ -324,7 +240,6 @@ int main()
 			objs[i].renderFullObject();
 		}
 
-		//drawFloor(phongProgram);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

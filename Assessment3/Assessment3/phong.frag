@@ -19,7 +19,7 @@ float CalculateSpotIllumination();
 
 void main()
 {
-	float phong = CalculatePositionalIllumination();
+	float phong = CalculateDirectionIllumination();
 	vec4 texColour = texture(Texture,tex);
 	if (texColour.a < 0.1)
 		discard;

@@ -1,7 +1,6 @@
 #include "CompleteObject.h"
 
 CompleteObject::CompleteObject(){
-
 }
 
 CompleteObject::CompleteObject(GLuint shaderProgram, const char* filename) {

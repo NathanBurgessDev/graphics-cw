@@ -63,6 +63,7 @@ public:
 		vc = vc_in;
 		tc = tc_in;
 		nc = nc_in;
+		
 	}
 	~vertex() {}
 };

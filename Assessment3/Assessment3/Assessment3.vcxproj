@@ -135,8 +135,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\include\GL\gl3w.c" />
     <ClCompile Include="Assessment3.cpp" />
+    <ClCompile Include="bitmap.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="CompleteObject.cpp" />
     <ClCompile Include="obj.cpp" />
+    <ClCompile Include="shadow.cpp" />
     <ClCompile Include="ShadowRendering.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="texture.cpp" />
