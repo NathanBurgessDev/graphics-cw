@@ -122,12 +122,12 @@ int main()
 	glDebugMessageCallback(DebugCallback, 0);
 
 	
-	//ShadowRendering shadowRenderer = ShadowRendering(width, height);
+	
 
 	//GLuint textureShaderProgram = CompileShader("textured.vert", "textured.frag");
 	//GLuint basicShaderProgram = CompileShader("basic.vert", "basic.frag");
 	GLuint phongProgram = CompileShader("phong.vert", "phong.frag");
-	//GLuint shadowProgram = CompileShader("shadow.vert", "shadow.frag");
+	GLuint shadowProgram = CompileShader("shadow.vert", "shadow.frag");
 
 
 	InitCamera(Camera);
@@ -147,11 +147,12 @@ int main()
 	//Terrain ground
 	Terrain ground = Terrain(phongProgram, 20,20, 40,10);
 	
-	
+	objs.push_back(ground);
  	objs.push_back(tree0);
 	objs.push_back(tree1);
-	objs.push_back(ground);
+	
 
+	ShadowRendering shadowRenderer = ShadowRendering(width, height);
 	
 
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -192,36 +193,40 @@ int main()
 		float near_plane = 1;
 		float far_plane = 70.5;
 
+
+		// ~~~~~~~ Generate ShadowDepthMap ~~~~~~~~~~
+
+		glm::mat4 lightProjection = glm::ortho(-10.f, 10.f, -10.f, 10.f, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDirection, glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 projectedLightSpaceMatrix = lightProjection * lightView;
+
+		shadowRenderer.generateDepthMap(shadowProgram, objs, projectedLightSpaceMatrix);
+
+		//~~~~~~~ End ShadowDepth Map ~~~~~~~~~~~~~~~
+
+		glViewport(0, 0, width, height);
 		glClearColor(.8f, .8f, .8f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		
 
-
-		/*glm::mat4 lightProjection = glm::ortho(-10.f, 10.f, -10.f, 10.f, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDirection, glm::vec3(0.f, 1.f, 0.f));
-		glm::mat4 projectedLightSpaceMatrix = lightProjection * lightView;
-*/
-
-		// ~~~~~~ Lighting ~~~~~~~
-
-
-
-
-		/*glUseProgram(basicShaderProgram);
-		glUniformMatrix4fv(glGetUniformLocation(basicShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(basicShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		drawFloor(basicShaderProgram);*/
-
-		
+		// ~~~~~~ Lighting + Shadows ~~~~~~~
 
 		glUseProgram(phongProgram);
 
-		
+		//GLuint texturePos = glGetUniformLocation(phongProgram, "Texture");
+		GLuint shadowPos = glGetUniformLocation(phongProgram, "shadowMap");
 
+		glUniform1i(shadowPos, 1);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, shadowRenderer.shadowMap.Texture);
+
+
+		
+		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projectedLightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(projectedLightSpaceMatrix));
 		glUniform3f(glGetUniformLocation(phongProgram, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
-		glUniform3f(glGetUniformLocation(phongProgram, "lightColour"), 1.f, 1.f, 1.f);
+		glUniform3f(glGetUniformLocation(phongProgram, "lightColour"), 1, 1, 1);
 		glUniform3f(glGetUniformLocation(phongProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(phongProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
 	
@@ -236,7 +241,7 @@ int main()
 		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-		for (int i = 0; i < objs.size();i++) {
+ 		for (int i = 0; i < objs.size();i++) {
 			objs[i].renderFullObject();
 		}
 

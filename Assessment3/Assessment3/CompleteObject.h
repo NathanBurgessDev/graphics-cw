@@ -14,8 +14,7 @@ public:
 	CompleteObject(GLuint shaderProgram, const char* filename);
 	CompleteObject(GLuint shaderProgram);
 	CompleteObject();
-	//CompleteObject(std::vector<float>& verticies, std::string fileName);
-
+	//CompleteObject(std::vector<float>& verticies, std::string fileName)
 	void renderFullObject();
 	void renderFullObjectWithShader(GLuint newShaderProgram);
 

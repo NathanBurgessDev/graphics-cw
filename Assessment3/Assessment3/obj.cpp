@@ -7,6 +7,7 @@ Object::Object() {
 }
 
 void Object::renderObject(unsigned int shaderProgram) {
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
 

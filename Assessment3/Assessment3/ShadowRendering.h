@@ -10,9 +10,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <vector>
 
 #include "shadow.h"
 #include "camera.h"
+#include "CompleteObject.h"
+
 
 class ShadowRendering
 {
@@ -21,11 +24,10 @@ public:
 	int height;
 	int sh_map_width = 2048;
 	int sh_map_height = 2048;
+	ShadowStruct shadowMap = setup_shadowmap(sh_map_width, sh_map_height);
 
 	ShadowRendering(int width, int height);
-	void generateDepthMap(unsigned int shadowShaderProgram, ShadowStruct shadow,
+	void generateDepthMap(unsigned int shadowShaderProgram, std::vector<CompleteObject>& objs,
 		glm::mat4 projectedLightSpaceMatrix);
-	void renderWithShadow(unsigned int renderShaderProgram, ShadowStruct shadow,
-		glm::mat4 projectedLightSpaceMatrix, glm::vec3 lightDirection, glm::vec3 lightPos, SCamera camera);
 };
 
