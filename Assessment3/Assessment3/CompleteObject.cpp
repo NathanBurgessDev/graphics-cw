@@ -1,7 +1,11 @@
 #include "CompleteObject.h"
 
+CompleteObject::CompleteObject(){
 
-CompleteObject::CompleteObject(const char* filename) {
+}
+
+CompleteObject::CompleteObject(GLuint shaderProgram, const char* filename) {
+	this->shaderProgram = shaderProgram;
 	model = std::make_shared<glm::mat4>(1.f);
 	obj_parse(filename, &objs, model);
 	for (int i = 0; i < objs.size(); i++) {
@@ -9,8 +13,12 @@ CompleteObject::CompleteObject(const char* filename) {
 	}
 }
 
-void CompleteObject::renderFullObject(unsigned int shaderProgram) {
-	for (Object& obj : objs) {
+CompleteObject::CompleteObject(GLuint shaderProgram) {
+	this->shaderProgram = shaderProgram;
+};
+
+void CompleteObject::renderFullObject() {
+ 	for (Object& obj : objs) {
 		obj.renderObject(shaderProgram);		
 	}
 }

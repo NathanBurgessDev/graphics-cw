@@ -53,12 +53,12 @@ public:
 struct vertex
 {
 public:
-	vec3 vc;
-	vec3 tc;
-	vec3 nc;
+	glm::vec3 vc;
+	glm::vec3 tc;
+	glm::vec3 nc;
 
 	vertex() {}
-	vertex(vec3 vc_in, vec3 tc_in, vec3 nc_in)
+	vertex(glm::vec3 vc_in, glm::vec3 tc_in, glm::vec3 nc_in)
 	{
 		vc = vc_in;
 		tc = tc_in;
@@ -109,7 +109,7 @@ public:
 	std::shared_ptr<glm::mat4> model;
 	GLuint programType;
 
-
+	Object();
 	Object(std::shared_ptr<glm::mat4> modelIn) {
 		model = modelIn;
 	}

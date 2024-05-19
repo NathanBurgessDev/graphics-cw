@@ -1,6 +1,7 @@
 #pragma once
 
 #include "obj.h"
+#include <vector>
 
 
 class CompleteObject
@@ -8,10 +9,14 @@ class CompleteObject
 public:
 	vector<Object> objs;
 	std::shared_ptr<glm::mat4> model;
+	GLuint shaderProgram;
 
-	CompleteObject(const char* filename);
+	CompleteObject(GLuint shaderProgram, const char* filename);
+	CompleteObject(GLuint shaderProgram);
+	CompleteObject();
+	//CompleteObject(std::vector<float>& verticies, std::string fileName);
 
-	void renderFullObject(unsigned int shaderProgram);
+	void renderFullObject();
 
 	void translate(float x, float y, float z);
 

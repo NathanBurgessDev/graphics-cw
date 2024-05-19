@@ -18,6 +18,7 @@ using namespace std;
 #include "camera.h"
 #include "CompleteObject.h"
 #include "shadow.h"
+#include "Terrain.h"
 //#include "ShadowRendering.h"
 
 
@@ -33,7 +34,7 @@ SCamera Camera;
 glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
 glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
 
-float vertices[] =
+std::vector<float> vertices =
 {
 	//back face
 	//pos					//col				//normal
@@ -94,7 +95,7 @@ void setupFloor() {
 	glBindVertexArray(floorVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices.data()), vertices.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (9 * sizeof(float)), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -219,21 +220,23 @@ int main()
 	vector<CompleteObject> objs;
 	glEnable(GL_DEPTH_TEST);
 
-	CompleteObject tree0 = CompleteObject("objs/white_oak/white_oak.obj");
+	CompleteObject tree0 = CompleteObject(phongProgram,"objs/white_oak/white_oak.obj");
 	tree0.scale(0.005, 0.005, 0.005);
 
-	CompleteObject tree1 = CompleteObject("objs/white_oak/white_oak.obj");
+	CompleteObject tree1 = CompleteObject(phongProgram,"objs/white_oak/white_oak.obj");
 	tree1.translate(5.0, 0.0, 0.0);
 	tree1.scale(0.005, 0.005, 0.005);
 	
+	//Terrain ground
+	Terrain ground = Terrain(phongProgram, 8, 8, 64);
 
 	
 	
 	objs.push_back(tree0);
 	objs.push_back(tree1);
+	objs.push_back(ground);
 
 	
-	setupFloor();
 
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//glBindVertexArray(0);
@@ -317,9 +320,11 @@ int main()
 		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-		for (CompleteObject& object : objs) {
-			object.renderFullObject(phongProgram);
+		for (int i = 0; i < objs.size();i++) {
+			objs[i].renderFullObject();
 		}
+
+		//drawFloor(phongProgram);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

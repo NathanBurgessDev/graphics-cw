@@ -33,6 +33,9 @@
     <ClCompile Include="ShadowRendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="textured.frag">
@@ -86,6 +89,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShadowRendering.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

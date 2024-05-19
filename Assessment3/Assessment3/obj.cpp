@@ -2,6 +2,10 @@
 
 #include "obj.h"
 
+Object::Object() {
+	mtl = Material();
+}
+
 void Object::renderObject(unsigned int shaderProgram) {
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(VAO);
@@ -98,9 +102,9 @@ int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::m
 	// Stores the values parsed before reaching the first "usemtl"
 	// So we can index them later
 	vector<Material> materials;
-	vector<vec3> vecs;
-	vector<vec2> uvs;
-	vector<vec3> normals;
+	vector<glm::vec3> vecs;
+	vector<glm::vec2> uvs;
+	vector<glm::vec3> normals;
 
 	// The provided file name is given as filename = "obj/FILE/file.obj"
 	// As a result when we put the material destination into *objs
@@ -142,7 +146,7 @@ int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::m
 		// Checks for a vertex position "v" and stores it on the vertex vector
 		// for use later
 		if (strcmp(lineHeader, "v") == 0) {
-			vec3 vertex;
+			glm::vec3 vertex;
 			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 			vecs.push_back(vertex);
 		}
@@ -150,14 +154,14 @@ int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::m
 		// Checks for a vertex texture "vt" and stores it in the "uv" vector
 		// for use later
 		else if (strcmp(lineHeader, "vt") == 0) {
-			vec2 uv;
+			glm::vec2 uv;
 			fscanf(file, "%f %f\n", &uv.x, &uv.y);
 			uvs.push_back(uv);
 		}
 
 		// Checks for a vertex normal "vn"
 		else if (strcmp(lineHeader, "vn") == 0) {
-			vec3 normal;
+			glm::vec3 normal;
 			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
 			normals.push_back(normal);
 		}
@@ -235,7 +239,7 @@ int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::m
 				float textureCoordX = uvs[indexOfUv - 1].x;
 				float textureCoordY = uvs[indexOfUv - 1].y;
 
-				tri.verts[i].tc = vec3(textureCoordX, textureCoordY, 0);
+				tri.verts[i].tc = glm::vec3(textureCoordX, textureCoordY, 0);
 
 				tri.verts[i].nc = normals[indexOfNormal - 1];
 			}

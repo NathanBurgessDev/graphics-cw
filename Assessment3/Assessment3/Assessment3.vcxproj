@@ -138,6 +138,7 @@
     <ClCompile Include="CompleteObject.cpp" />
     <ClCompile Include="obj.cpp" />
     <ClCompile Include="ShadowRendering.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +160,7 @@
     <ClInclude Include="shadow.h" />
     <ClInclude Include="ShadowRendering.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
