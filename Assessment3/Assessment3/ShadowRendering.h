@@ -29,5 +29,6 @@ public:
 	ShadowRendering(int width, int height);
 	void generateDepthMap(unsigned int shadowShaderProgram, std::vector<CompleteObject>& objs,
 		glm::mat4 projectedLightSpaceMatrix);
+	void saveShadowMap();
 };
 

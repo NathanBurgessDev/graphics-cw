@@ -20,6 +20,7 @@ using namespace std;
 #include "shadow.h"
 #include "Terrain.h"
 #include "ShadowRendering.h"
+#include "Tree.h"
 
 
 
@@ -39,6 +40,9 @@ glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
 void SizeCallback(GLFWwindow* window, int w, int h)
 {
 	glViewport(0, 0, w, h);
+	ShadowRendering* shadowRenderer = static_cast<ShadowRendering*>(glfwGetWindowUserPointer(window));
+	shadowRenderer->height = h;
+	shadowRenderer->width = w;
 }
 
 
@@ -116,8 +120,10 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeCallback(window, SizeCallback);
 
+
+
 	gl3wInit();
- 	glfwSwapInterval(1);
+ 	glfwSwapInterval(0);
 
 	// Debugging
 	glEnable(GL_DEBUG_OUTPUT);
@@ -139,15 +145,16 @@ int main()
 	vector<CompleteObject> objs;
 	glEnable(GL_DEPTH_TEST);
 
-	CompleteObject tree0 = CompleteObject(phongProgram,"objs/white_oak/white_oak.obj");
+	Tree tree0 = Tree(phongProgram,"objs/white_oak/white_oak.obj");
+	tree0.translate(0.f, 0.f, 0.0f);
 	tree0.scale(0.005f, 0.005f, 0.005f);
 
-	CompleteObject tree1 = CompleteObject(phongProgram,"objs/white_oak/white_oak.obj");
-	tree1.translate(5.0f, 0.0f, 0.0f);
+	Tree tree1 = Tree(phongProgram,"objs/white_oak/white_oak.obj");
+	tree1.translate(5.0f, 0.f, 0.0f);
 	tree1.scale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
-	Terrain ground = Terrain(phongProgram, 20,20, 40,10);
+	Terrain ground = Terrain(phongProgram, 40,40, 40,10);
 	
 	objs.push_back(ground);
  	objs.push_back(tree0);
@@ -155,7 +162,7 @@ int main()
 	
 
 	ShadowRendering shadowRenderer = ShadowRendering(width, height);
-	
+	glfwSetWindowUserPointer(window, &shadowRenderer);
 
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//glBindVertexArray(0);
@@ -203,11 +210,13 @@ int main()
 		glm::mat4 projectedLightSpaceMatrix = lightProjection * lightView;
 
 		shadowRenderer.generateDepthMap(shadowProgram, objs, projectedLightSpaceMatrix);
+		//shadowRenderer.saveShadowMap();
+		
 
 		//~~~~~~~ End ShadowDepth Map ~~~~~~~~~~~~~~~
 
 		glViewport(0, 0, width, height);
-		glClearColor(.8f, .8f, .8f, 1.f);
+		glClearColor(.8f, .8f, .8f, .8f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

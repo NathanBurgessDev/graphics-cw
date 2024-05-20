@@ -24,7 +24,7 @@ void CompleteObject::renderFullObject() {
 
 void CompleteObject::renderFullObjectWithShader(GLuint newShaderProgram){
 	for (Object& obj : objs) {
-		obj.renderObject(newShaderProgram);
+		obj.renderShadowObject(newShaderProgram);
 	}
 }
 

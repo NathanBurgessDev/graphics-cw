@@ -88,6 +88,7 @@ Terrain::Terrain(GLuint shaderProgram,float width, float height, float resolutio
 
 
 	setupTextureAndVAO(obj);
+	obj.hasInside = false;
 	objs.push_back(obj);
 
 }

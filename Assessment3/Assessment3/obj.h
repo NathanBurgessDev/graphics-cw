@@ -109,6 +109,7 @@ public:
 	GLuint texture;
 	std::shared_ptr<glm::mat4> model;
 	GLuint programType;
+	bool hasInside = true;
 
 	Object();
 	Object(std::shared_ptr<glm::mat4> modelIn) {
@@ -121,6 +122,7 @@ public:
 	}
 	void renderObject(unsigned int shaderProgram);
 	void setupTextureAndVAO();
+	void renderShadowObject(unsigned int shaderProgram);
 	~Object()
 	{
 	}

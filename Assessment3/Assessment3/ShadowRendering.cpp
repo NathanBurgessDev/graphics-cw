@@ -12,12 +12,17 @@ void ShadowRendering::generateDepthMap(unsigned int shadowShaderProgram,std::vec
 	glUseProgram(shadowShaderProgram);
 	glUniformMatrix4fv(glGetUniformLocation(shadowShaderProgram, "projectedLightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(projectedLightSpaceMatrix));
 	//drawFloorAndCubes(shadowShaderProgram);
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 	for (CompleteObject& obj : objs) {
 		obj.renderFullObjectWithShader(shadowShaderProgram);
 	}
-	glCullFace(GL_BACK);
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_CULL_FACE);
+}
+
+void ShadowRendering::saveShadowMap() {
+	saveShadowMapToBitmap(shadowMap.Texture, sh_map_width, sh_map_height);
 }
 
 

@@ -6,6 +6,25 @@ Object::Object() {
 	mtl = Material();
 }
 
+void Object::renderShadowObject(unsigned int shaderProgram) {
+	/*if (hasInside) {
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+	}
+	else {
+		glDisable(GL_CULL_FACE);
+	}*/
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindVertexArray(VAO);
+
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(*model));
+
+	glDrawArrays(GL_TRIANGLES, 0, (tris.size() * 3));
+}
+
+
 void Object::renderObject(unsigned int shaderProgram) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
