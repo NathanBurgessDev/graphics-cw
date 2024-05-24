@@ -21,11 +21,11 @@ using namespace std;
 #include "Terrain.h"
 #include "ShadowRendering.h"
 #include "Tree.h"
+#include "SkyBox.h"
 
 
-
-const int width = 1200;
-const int height = 800;
+int width = 1200;
+int height = 800;
 
 unsigned int floorVAO;
 unsigned int floorVBO;
@@ -40,6 +40,9 @@ glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
 void SizeCallback(GLFWwindow* window, int w, int h)
 {
 	glViewport(0, 0, w, h);
+	width = w;
+	height = h;
+
 	ShadowRendering* shadowRenderer = static_cast<ShadowRendering*>(glfwGetWindowUserPointer(window));
 	shadowRenderer->height = h;
 	shadowRenderer->width = w;
@@ -136,11 +139,16 @@ int main()
 	//GLuint basicShaderProgram = CompileShader("basic.vert", "basic.frag");
 	GLuint phongProgram = CompileShader("phong.vert", "phong.frag");
 	GLuint shadowProgram = CompileShader("shadow.vert", "shadow.frag");
+	GLuint skyBoxProgram = CompileShader("skybox.vert", "skybox.frag");
+
+	
 
 
 	InitCamera(Camera);
 	Camera.cam_dist = 5.f;
 	MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), Camera.cam_dist, 0.f, 0.f);
+
+	SkyBox skyBox = SkyBox(skyBoxProgram);
 
 	vector<CompleteObject> objs;
 	glEnable(GL_DEPTH_TEST);
@@ -154,7 +162,7 @@ int main()
 	tree1.scale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
-	Terrain ground = Terrain(phongProgram, 40,40, 40,10);
+	Terrain ground = Terrain(phongProgram, 100,100, 40,10);
 	
 	objs.push_back(ground);
  	objs.push_back(tree0);
@@ -184,7 +192,7 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-
+		 
 		currentTime = glfwGetTime();
 		timeDiff = currentTime - prevTime;
 		counter++;
@@ -198,9 +206,10 @@ int main()
 			//std::cout << newTitle << std::endl;
 
 		}
+		processKeyboard(window);
 
-		float near_plane = 1;
-		float far_plane = 70.5;
+		float near_plane = 1.f;
+		float far_plane = 75.5f;
 
 
 		// ~~~~~~~ Generate ShadowDepthMap ~~~~~~~~~~
@@ -222,6 +231,15 @@ int main()
 
 
 		// ~~~~~~ Lighting + Shadows ~~~~~~~
+	
+		glm::mat4 view = glm::mat4(1.f);
+		glm::mat4 projection = glm::mat4(1.f);
+
+		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
+		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
+
+		skyBox.RenderSkyBox(view,projection);
+
 
 		glUseProgram(phongProgram);
 
@@ -242,9 +260,6 @@ int main()
 		glUniform3f(glGetUniformLocation(phongProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
 	
 
-		glm::mat4 view = glm::mat4(1.f);
-		glm::mat4 projection = glm::mat4(1.f);
-
 		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
 
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -252,14 +267,15 @@ int main()
 		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+
  		for (int i = 0; i < objs.size();i++) {
 			objs[i].renderFullObject();
 		}
 
+		
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		processKeyboard(window);
 	}
 	glfwDestroyWindow(window);
 	glfwTerminate();

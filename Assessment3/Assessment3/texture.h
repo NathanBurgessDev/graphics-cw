@@ -68,4 +68,9 @@
 
 #include "stb_image.h"
 
+#include <vector>
+#include <string>
+#include <iostream>
+
 GLuint CreateTexture(const char* filename);
+GLuint loadCubeMap(std::vector<std::string> faces);

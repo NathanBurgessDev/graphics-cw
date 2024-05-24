@@ -141,6 +141,7 @@
     <ClCompile Include="obj.cpp" />
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="ShadowRendering.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="Tree.cpp" />
@@ -152,6 +153,8 @@
     <None Include="phong.vert" />
     <None Include="shadow.frag" />
     <None Include="shadow.vert" />
+    <None Include="skybox.frag" />
+    <None Include="skybox.vert" />
     <None Include="textured.frag" />
     <None Include="textured.vert" />
   </ItemGroup>
@@ -163,6 +166,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="shadow.h" />
     <ClInclude Include="ShadowRendering.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="texture.h" />

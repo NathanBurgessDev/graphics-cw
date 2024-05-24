@@ -18,12 +18,11 @@ void ShadowRendering::generateDepthMap(unsigned int shadowShaderProgram,std::vec
 	}
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
 }
 
 void ShadowRendering::saveShadowMap() {
 	saveShadowMapToBitmap(shadowMap.Texture, sh_map_width, sh_map_height);
 }
-
 
 

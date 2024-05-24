@@ -48,6 +48,9 @@
     <ClCompile Include="Tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="textured.frag">
@@ -72,6 +75,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shadow.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="skybox.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="skybox.frag">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -107,6 +116,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
