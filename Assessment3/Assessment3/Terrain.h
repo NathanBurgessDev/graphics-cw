@@ -16,6 +16,6 @@ public:
 	void renderFullObjectWithShader(GLuint newShaderProgram) override;
 	void setupTextureAndVAO(Object& obj);
 	void renderObject(Object& obj);
-	glm::vec3 calculateNormal(int x, int z, unsigned char* data, unsigned bytePerPixel, int width, float yScale, float yShift);
+	glm::vec3 calculateNormal(int x, int z, unsigned char* data, unsigned bytePerPixel, int width,int height, float yScale, float yShift);
 };
 

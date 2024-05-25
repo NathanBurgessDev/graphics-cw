@@ -25,7 +25,7 @@ void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, 
 	// vertex generation
 	std::vector<float> vertices;
 	float yScale = 64.0f / 256.0f, yShift = 16.0f;
-	int rez = 4;
+	int rez = 1;
 	unsigned bytePerPixel = numChannels;
 	for (int i = 0; i < height; i++)
 	{
@@ -40,10 +40,10 @@ void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, 
 			vertices.push_back(-width / 2.0f + width * j / (float)width);   // vz
 			vertices.push_back(i / (float)texRes); //u
 			vertices.push_back(j / (float)texRes); // v
-			//glm::vec3 normal = calculateNormal(i, j, data, bytePerPixel, width, yScale, yShift);
-			vertices.push_back(0.f);
-			vertices.push_back(1.f);
-			vertices.push_back(0.f);
+			glm::vec3 normal = calculateNormal(i, j, data, bytePerPixel, width, height, yScale, yShift);
+			vertices.push_back(normal.x);
+			vertices.push_back(normal.y);
+			vertices.push_back(normal.z);
 		}
 	}
 	stbi_image_free(data);
@@ -87,7 +87,10 @@ void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, 
 }
 
 
-glm::vec3 Terrain::calculateNormal(int x, int z, unsigned char* data, unsigned bytePerPixel, int width, float yScale, float yShift) {
+glm::vec3 Terrain::calculateNormal(int x, int z, unsigned char* data, unsigned bytePerPixel, int width, int height, float yScale, float yShift) {
+	if (x == 0 || z == 0 || x >= width-1 || z >= height-1) {
+		return glm::vec3(0.f, 1.f, 0.f);
+	}
 	unsigned char* pixelOffset = data + ((x-1) + width * z) * bytePerPixel;
 	unsigned char y = pixelOffset[0];
 	float heightL = ((int)y * yScale - yShift);

@@ -127,7 +127,7 @@ int main()
 
 
 	gl3wInit();
- 	glfwSwapInterval(0);
+ 	glfwSwapInterval(1);
 
 	// Debugging
 	glEnable(GL_DEBUG_OUTPUT);
