@@ -156,11 +156,11 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	std::unique_ptr<Tree> tree0 = std::make_unique<Tree>(phongProgram,"objs/white_oak/white_oak.obj");
-	tree0->translate(0.f, 10.f, 0.0f);
+	tree0->translate(0.f, 5.f, 0.0f);
 	tree0->scale(0.005f, 0.005f, 0.005f);
 
 	std::unique_ptr<Tree> tree1 = std::make_unique<Tree>(phongProgram, "objs/white_oak/white_oak.obj");
-	tree1->translate(5.0f, 10.f, 0.0f);
+	tree1->translate(5.0f, 5.f, 0.0f);
 	tree1->scale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
@@ -245,14 +245,21 @@ int main()
 
 		glUseProgram(phongProgram);
 
-		//GLuint texturePos = glGetUniformLocation(phongProgram, "Texture");
-		GLuint shadowPosPhong = glGetUniformLocation(phongProgram, "shadowMap");
+	/*	GLuint shadowPosPhong = glGetUniformLocation(phongProgram, "shadowMap");
 		GLuint shadowPosTerrain = glGetUniformLocation(heightMapProgram, "shadowMap");
 
 		glUniform1i(shadowPosPhong, 1);
+		glUniform1i(shadowPosTerrain, 2);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, shadowRenderer.shadowMap.Texture);
+
+		glUseProgram(heightMapProgram);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, shadowRenderer.shadowMap.Texture);
+
+		glUseProgram(phongProgram);*/
 
 
 		
@@ -261,7 +268,6 @@ int main()
 		glUniform3f(glGetUniformLocation(phongProgram, "lightColour"), 1, 1, 1);
 		glUniform3f(glGetUniformLocation(phongProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(phongProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
-	
 
 		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
 
@@ -270,16 +276,28 @@ int main()
 		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+
+
 		glUseProgram(heightMapProgram);
 
-		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "projectedLightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(projectedLightSpaceMatrix));
+		glUniform3f(glGetUniformLocation(heightMapProgram, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
+		glUniform3f(glGetUniformLocation(heightMapProgram, "lightColour"), 1, 1, 1);
+		glUniform3f(glGetUniformLocation(heightMapProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(glGetUniformLocation(heightMapProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
+	
+		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
 
 		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-		glUseProgram(phongProgram);
+		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
+
+		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+
 
 		for (std::unique_ptr<CompleteObject>& obj: objs) {
-			obj->renderFullObject();
+			obj->renderFullObject(shadowRenderer.shadowMap.Texture);
 		}
 
 		

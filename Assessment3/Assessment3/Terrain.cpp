@@ -9,6 +9,7 @@ Terrain::Terrain(GLuint shaderProgram,float width, float height, float resolutio
 void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, float res){
 	this->shaderProgram = shaderProgram;
 	model = std::make_shared<glm::mat4>(1.f);
+	this->texture = CreateTexture("objs/floor/grassTexture.png");
 	unsigned char* data = getHeightMap("objs/floor/heightMap.png", width, height, numChannels);
 	if (data)
 	{
@@ -19,10 +20,12 @@ void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, 
 		std::cout << "Failed to load texture" << std::endl;
 	}
 
+	float texRes = resolution / res;
+
 	// vertex generation
 	std::vector<float> vertices;
 	float yScale = 64.0f / 256.0f, yShift = 16.0f;
-	int rez = 1;
+	int rez = 4;
 	unsigned bytePerPixel = numChannels;
 	for (int i = 0; i < height; i++)
 	{
@@ -35,6 +38,12 @@ void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, 
 			vertices.push_back(-height / 2.0f + height * i / (float)height);   // vx
 			vertices.push_back((int)y * yScale - yShift);   // vy
 			vertices.push_back(-width / 2.0f + width * j / (float)width);   // vz
+			vertices.push_back(i / (float)texRes); //u
+			vertices.push_back(j / (float)texRes); // v
+			//glm::vec3 normal = calculateNormal(i, j, data, bytePerPixel, width, yScale, yShift);
+			vertices.push_back(0.f);
+			vertices.push_back(1.f);
+			vertices.push_back(0.f);
 		}
 	}
 	stbi_image_free(data);
@@ -63,13 +72,40 @@ void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, 
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
 
 	glGenBuffers(1, &terrainIBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainIBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned), &indices[0], GL_STATIC_DRAW);
 
+}
+
+
+glm::vec3 Terrain::calculateNormal(int x, int z, unsigned char* data, unsigned bytePerPixel, int width, float yScale, float yShift) {
+	unsigned char* pixelOffset = data + ((x-1) + width * z) * bytePerPixel;
+	unsigned char y = pixelOffset[0];
+	float heightL = ((int)y * yScale - yShift);
+
+	pixelOffset = data + ((x + 1) + width * z) * bytePerPixel;
+	y = pixelOffset[0];	
+	float heightR = ((int)y * yScale - yShift);
+
+	pixelOffset = data + (x + width * (z-1)) * bytePerPixel;
+	y = pixelOffset[0];	
+	float heightD = ((int)y * yScale - yShift);
+
+	pixelOffset = data + (x + width * (z +1)) * bytePerPixel;
+	y = pixelOffset[0];
+	float heightU = ((int)y * yScale - yShift);
+
+	glm::vec3 normal = glm::normalize(glm::vec3(heightL - heightR, 2.f, heightD - heightU));
+	return normal;
 }
 
 void Terrain::constructFlatPlane(GLuint shaderProgram, float width, float height, float resolution, float res) {
@@ -163,12 +199,18 @@ void Terrain::constructFlatPlane(GLuint shaderProgram, float width, float height
 	objs.push_back(obj);
 }
 
-void Terrain::renderFullObject(){
+void Terrain::renderFullObject(GLuint shadowTexture){
 	/*for (Object& obj : objs) {
 		renderObject(obj);
-	}*/
+	}*/ 
 
 	glUseProgram(shaderProgram);
+	GLuint shadowMapPos = glGetUniformLocation(shaderProgram, "shadowMap");
+	glUniform1i(shadowMapPos, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, shadowTexture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texture);
 	glBindVertexArray(terrainVAO);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(*model));
 	unsigned strip = 1;
@@ -183,8 +225,12 @@ void Terrain::renderFullObject(){
 
 void Terrain::renderFullObjectWithShader(GLuint newShaderProgram) {
 	glUseProgram(newShaderProgram);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texture);
 	glBindVertexArray(terrainVAO);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(*model));
+	glUniformMatrix4fv(glGetUniformLocation(newShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(*model));
 	unsigned strip = 1;
 	for (strip = 0; strip < numStrips; strip++)
 	{
@@ -193,6 +239,7 @@ void Terrain::renderFullObjectWithShader(GLuint newShaderProgram) {
 			GL_UNSIGNED_INT,     // index data type
 			(void*)(sizeof(unsigned int) * (numTrisPerStrip + 2) * strip)); // offset to starting index
 	}
+	glDisable(GL_CULL_FACE);
 }
 
 void Terrain::renderObject(Object& obj) {

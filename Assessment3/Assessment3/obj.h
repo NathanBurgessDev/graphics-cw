@@ -54,11 +54,11 @@ struct vertex
 {
 public:
 	glm::vec3 vc;
-	glm::vec3 tc;
+	glm::vec2 tc;
 	glm::vec3 nc;
 
 	vertex() {}
-	vertex(glm::vec3 vc_in, glm::vec3 tc_in, glm::vec3 nc_in)
+	vertex(glm::vec3 vc_in, glm::vec2 tc_in, glm::vec3 nc_in)
 	{
 		vc = vc_in;
 		tc = tc_in;

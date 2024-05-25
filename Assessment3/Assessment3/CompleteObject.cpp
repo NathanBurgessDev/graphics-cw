@@ -16,8 +16,12 @@ CompleteObject::CompleteObject(GLuint shaderProgram) {
 	this->shaderProgram = shaderProgram;
 };
 
-void CompleteObject::renderFullObject() {
+void CompleteObject::renderFullObject(GLuint shadowTexture) {
 	glUseProgram(shaderProgram);
+	GLuint shadowMapPos = glGetUniformLocation(shaderProgram, "shadowMap");
+	glUniform1i(shadowMapPos, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, shadowTexture);
  	for (Object& obj : objs) {
 		obj.renderObject(shaderProgram);		
 	}

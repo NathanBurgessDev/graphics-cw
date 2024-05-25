@@ -15,7 +15,7 @@ public:
 	CompleteObject(GLuint shaderProgram);
 	CompleteObject();
 	//CompleteObject(std::vector<float>& verticies, std::string fileName)
-	virtual void renderFullObject();
+	virtual void renderFullObject(GLuint shadowTexture);
 	virtual void renderFullObjectWithShader(GLuint newShaderProgram);
 
 	void translate(float x, float y, float z);

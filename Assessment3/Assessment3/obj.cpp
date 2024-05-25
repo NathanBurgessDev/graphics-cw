@@ -44,12 +44,12 @@ void Object::renderObject(unsigned int shaderProgram) {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (tris.size() * 27), tris.data(), GL_STATIC_DRAW);
- 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (tris.size() * 24), tris.data(), GL_STATIC_DRAW);
+ 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 }
 
@@ -259,7 +259,7 @@ int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::m
 				float textureCoordX = uvs[indexOfUv - 1].x;
 				float textureCoordY = uvs[indexOfUv - 1].y;
 
-				tri.verts[i].tc = glm::vec3(textureCoordX, textureCoordY, 0);
+				tri.verts[i].tc = glm::vec2(textureCoordX, textureCoordY);
 
 				tri.verts[i].nc = normals[indexOfNormal - 1];
 			}
