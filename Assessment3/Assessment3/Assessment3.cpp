@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 using namespace std;
 #define STB_IMAGE_IMPLEMENTATION
@@ -140,6 +141,7 @@ int main()
 	GLuint phongProgram = CompileShader("phong.vert", "phong.frag");
 	GLuint shadowProgram = CompileShader("shadow.vert", "shadow.frag");
 	GLuint skyBoxProgram = CompileShader("skybox.vert", "skybox.frag");
+	GLuint heightMapProgram = CompileShader("heightMap.vert", "heightMap.frag");
 
 	
 
@@ -150,23 +152,23 @@ int main()
 
 	SkyBox skyBox = SkyBox(skyBoxProgram);
 
-	vector<CompleteObject> objs;
+	vector<std::unique_ptr<CompleteObject>> objs;
 	glEnable(GL_DEPTH_TEST);
 
-	Tree tree0 = Tree(phongProgram,"objs/white_oak/white_oak.obj");
-	tree0.translate(0.f, 0.f, 0.0f);
-	tree0.scale(0.005f, 0.005f, 0.005f);
+	std::unique_ptr<Tree> tree0 = std::make_unique<Tree>(phongProgram,"objs/white_oak/white_oak.obj");
+	tree0->translate(0.f, 10.f, 0.0f);
+	tree0->scale(0.005f, 0.005f, 0.005f);
 
-	Tree tree1 = Tree(phongProgram,"objs/white_oak/white_oak.obj");
-	tree1.translate(5.0f, 0.f, 0.0f);
-	tree1.scale(0.005f, 0.005f, 0.005f);
+	std::unique_ptr<Tree> tree1 = std::make_unique<Tree>(phongProgram, "objs/white_oak/white_oak.obj");
+	tree1->translate(5.0f, 10.f, 0.0f);
+	tree1->scale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
-	Terrain ground = Terrain(phongProgram, 100,100, 40,10);
+	std::unique_ptr<Terrain> ground= std::make_unique<Terrain>(heightMapProgram, 100,100, 40,1.0);
 	
-	objs.push_back(ground);
- 	objs.push_back(tree0);
-	objs.push_back(tree1);
+	objs.push_back(std::move(ground));
+ 	objs.push_back(std::move(tree0));
+	objs.push_back(std::move(tree1));
 	
 
 	ShadowRendering shadowRenderer = ShadowRendering(width, height);
@@ -244,9 +246,10 @@ int main()
 		glUseProgram(phongProgram);
 
 		//GLuint texturePos = glGetUniformLocation(phongProgram, "Texture");
-		GLuint shadowPos = glGetUniformLocation(phongProgram, "shadowMap");
+		GLuint shadowPosPhong = glGetUniformLocation(phongProgram, "shadowMap");
+		GLuint shadowPosTerrain = glGetUniformLocation(heightMapProgram, "shadowMap");
 
-		glUniform1i(shadowPos, 1);
+		glUniform1i(shadowPosPhong, 1);
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, shadowRenderer.shadowMap.Texture);
@@ -267,9 +270,16 @@ int main()
 		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+		glUseProgram(heightMapProgram);
 
- 		for (int i = 0; i < objs.size();i++) {
-			objs[i].renderFullObject();
+		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+		glUseProgram(phongProgram);
+
+		for (std::unique_ptr<CompleteObject>& obj: objs) {
+			obj->renderFullObject();
 		}
 
 		

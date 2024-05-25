@@ -17,6 +17,7 @@ CompleteObject::CompleteObject(GLuint shaderProgram) {
 };
 
 void CompleteObject::renderFullObject() {
+	glUseProgram(shaderProgram);
  	for (Object& obj : objs) {
 		obj.renderObject(shaderProgram);		
 	}

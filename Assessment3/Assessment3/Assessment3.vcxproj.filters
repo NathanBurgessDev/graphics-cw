@@ -83,6 +83,12 @@
     <None Include="skybox.frag">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="heightMap.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="heightMap.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">

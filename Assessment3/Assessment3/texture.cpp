@@ -76,6 +76,15 @@ GLuint loadCubeMap(std::vector<std::string> faces) {
 	return textureID;
 }
 
+unsigned char* getHeightMap(std::string filePath, int& width, int& height, int& numChannels) {
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &numChannels, 0);
+	return data;
+}
+
+void freeImage(unsigned char* data) {
+	stbi_image_free(data);
+}
 //GLuint setupTexture(const char* filename)
 //{
 //	glEnable(GL_TEXTURE_2D);
