@@ -31,12 +31,22 @@ void Object::renderObject(unsigned int shaderProgram) {
 	glBindVertexArray(VAO);
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(*model));
+	glUniform3fv(glGetUniformLocation(shaderProgram, "Ka"), 1, glm::value_ptr(mtl.ambientColour));
+	glUniform3fv(glGetUniformLocation(shaderProgram, "Kd"), 1, glm::value_ptr(mtl.diffuseColour));
+	glUniform3fv(glGetUniformLocation(shaderProgram, "Ks"), 1, glm::value_ptr(mtl.specularColour));
+	glUniform1f(glGetUniformLocation(shaderProgram, "Ns"), mtl.specularHighlight);
+
 
 	glDrawArrays(GL_TRIANGLES, 0, (tris.size() * 3));
 }
 
  void Object::setupTextureAndVAO() {
-	texture = CreateTexture(mtl.fil_name);
+	 if (mtl.fil_name.length() == 0) {
+		 texture = CreateTexture("objs/emptyTex/blank.png");
+		}
+	 else {
+		 texture = CreateTexture(mtl.fil_name.c_str());
+	 }
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -78,19 +88,27 @@ int mtl_parse(char* filename, vector<Material>* mtls)
 
 		int endOfFile = fscanf(file, "%s", lineHeader);
 		if (endOfFile == EOF) {
+			if (currentMaterial) {
+				mtls->push_back(currentMaterial.value());
+			}
 			break;
 		}
 
 		// When we are given a new material, we need to make a new material
 		// Object and set the material name
 		if (strcmp(lineHeader, "newmtl") == 0) {
+			if (currentMaterial.has_value()) {
+				mtls->push_back(currentMaterial.value());
+			}
+			char mtlName[256];
 			currentMaterial = Material();
-			fscanf(file, "%s\n", currentMaterial->mtl_name);
+			fscanf(file, "%s\n", mtlName);
+			currentMaterial->mtl_name = mtlName;
 		}
 
 		// When given a file name for the material we need to set the current
 		// material file name and then add the material to the vector *mtls
-		if (strcmp(lineHeader, "map_Kd") == 0) {
+		else if (strcmp(lineHeader, "map_Kd") == 0) {
 			// We have the same problem with the file path as previously
 			// when setting the fileName we need the full path so we 
 			// concatenate the two together and then push the material to the vector
@@ -106,9 +124,30 @@ int mtl_parse(char* filename, vector<Material>* mtls)
 			strcat(mtlFilePath, mtlFileName);
 
 			// Copy the filePath into the fil_name
-			strcpy(currentMaterial->fil_name, mtlFilePath);
+			currentMaterial->fil_name = mtlFilePath;
 
-			mtls->push_back(currentMaterial.value());
+			//mtls->push_back(currentMaterial.value());
+		}
+
+		else if (strcmp(lineHeader, "Ns") == 0) {
+			float spec;
+			fscanf(file, "%f\n", &spec);
+			currentMaterial->specularHighlight = spec;
+		}
+		else if (strcmp(lineHeader, "Ka") == 0) {
+			float ambColour0,ambColour1, ambColour2;
+			fscanf(file, "%f %f %f\n", &ambColour0, &ambColour1, &ambColour2);
+			currentMaterial->ambientColour = glm::vec3(ambColour0,ambColour1,ambColour2);
+		}
+		else if (strcmp(lineHeader, "Kd") == 0) {
+			float diffColour0, diffColour1, diffColour2;
+			fscanf(file, "%f %f %f\n", &diffColour0, &diffColour1, &diffColour2);
+			currentMaterial->diffuseColour = glm::vec3(diffColour0,diffColour1, diffColour2);
+		}
+		else if (strcmp(lineHeader, "Ks") == 0) {
+			float specColour0, specColour1, specColour2;
+			fscanf(file, "%f %f %f\n", &specColour0, &specColour1, &specColour2);
+			currentMaterial->specularColour = glm::vec3(specColour0, specColour1, specColour2);
 		}
 	}
 
@@ -220,7 +259,7 @@ int obj_parse(const char* filename, vector<Object>* objs, std::shared_ptr<glm::m
 			fscanf(file, "%s\n", materialName);
 
 			for (Material material : materials) {
-				if (strcmp(material.mtl_name, materialName) == 0) {
+				if (material.mtl_name == materialName){
 					currentObject->mtl = material;
 				}
 			}

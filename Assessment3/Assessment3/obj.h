@@ -85,14 +85,16 @@ public:
 class Material
 {
 public:
-	char mtl_name[256];
-	char fil_name[256];
+	std::string mtl_name;
+	std::string fil_name;
+	float specularHighlight = 128;
+	glm::vec3 ambientColour = glm::vec3(0.5f,0.5f,0.5f), diffuseColour = glm::vec3(1.f, 1.f, 1.f), specularColour = glm::vec3(0.5f, 0.5f, 0.5f);
 
 	Material() {}
 	Material(char* n, char* f)
 	{
-		strcpy(mtl_name, n);
-		strcpy(fil_name, f);
+		mtl_name = n;
+		fil_name = f;
 	}
 	~Material()
 	{
@@ -117,8 +119,8 @@ public:
 	}
 	Object(Material m)
 	{
-		strcpy(mtl.fil_name, m.fil_name);
-		strcpy(mtl.mtl_name, m.mtl_name);
+		mtl.fil_name = m.fil_name;
+		mtl.mtl_name = m.mtl_name;
 	}
 	void renderObject(unsigned int shaderProgram);
 	void setupTextureAndVAO();

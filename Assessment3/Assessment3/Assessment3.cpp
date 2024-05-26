@@ -156,19 +156,27 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	std::unique_ptr<Tree> tree0 = std::make_unique<Tree>(phongProgram,"objs/white_oak/white_oak.obj");
-	tree0->translate(0.f, 5.f, 0.0f);
+	tree0->translate(0.f, 2.f, 0.0f);
 	tree0->scale(0.005f, 0.005f, 0.005f);
 
 	std::unique_ptr<Tree> tree1 = std::make_unique<Tree>(phongProgram, "objs/white_oak/white_oak.obj");
-	tree1->translate(5.0f, 5.f, 0.0f);
+	tree1->translate(5.0f, 2.f, 0.0f);
 	tree1->scale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
+
+	std::unique_ptr<CompleteObject> f22 = std::make_unique<CompleteObject>(phongProgram, "objs/f22/F-22.obj");
+	f22->translate(-8.f, 5.f, 0.f);
+	f22->scale(0.05f, 0.05f, 0.05f);
+
+
 	std::unique_ptr<Terrain> ground= std::make_unique<Terrain>(heightMapProgram, 100,100, 40,1.0);
 	
 	objs.push_back(std::move(ground));
+	objs.push_back(std::move(f22));
  	objs.push_back(std::move(tree0));
 	objs.push_back(std::move(tree1));
+	
 	
 
 	ShadowRendering shadowRenderer = ShadowRendering(width, height);
@@ -268,6 +276,14 @@ int main()
 		glUniform3f(glGetUniformLocation(phongProgram, "lightColour"), 1, 1, 1);
 		glUniform3f(glGetUniformLocation(phongProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(phongProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
+
+		glm::vec3 lightColour = glm::vec3(1.f, 1.f, 1.f);
+		glm::vec3 diffColour = lightColour * glm::vec3(1.f);
+		glm::vec3 ambColour = diffColour * glm::vec3(1.f);
+
+		glUniform3fv(glGetUniformLocation(phongProgram, "lightAmb"), 1, glm::value_ptr(ambColour));
+		glUniform3fv(glGetUniformLocation(phongProgram, "lightDiff"),1,glm::value_ptr(diffColour));
+		glUniform3f(glGetUniformLocation(phongProgram, "lightSpec"), 1.f, 1.f, 1.f);
 
 		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
 

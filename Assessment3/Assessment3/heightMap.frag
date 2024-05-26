@@ -42,7 +42,7 @@ vec3 calculateDiffuse(vec3 Nnor, vec3 NToLight){
 
 vec3 calculateSpecular(vec3 NrefLight, vec3 NcamDirection){
 
-	float shininess = 128;
+	float shininess = 1;
 
 	float spec = pow(max(dot(NcamDirection, NrefLight), 0), shininess);
 	return vec3(spec * lightColour);
@@ -157,7 +157,7 @@ float shadowOnFragment(vec4 FragPosProjectedLightSpace) {
 
 	vec3 Nnor = normalize(nor);
 	vec3 NToLight = normalize(-lightDirection);
-	float bias = max(0.005 * (1.0 - dot(Nnor, NToLight)), 0.005);
+	float bias = max(0.05 * (1.0 - dot(Nnor, NToLight)), 0.005);
 	//float bias = 0.005;
 
 	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);

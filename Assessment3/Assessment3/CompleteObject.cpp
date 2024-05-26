@@ -8,7 +8,7 @@ CompleteObject::CompleteObject(GLuint shaderProgram, const char* filename) {
 	model = std::make_shared<glm::mat4>(1.f);
 	obj_parse(filename, &objs, model);
 	for (int i = 0; i < objs.size(); i++) {
-		objs[i].setupTextureAndVAO();
+ 		objs[i].setupTextureAndVAO();
 	}
 }
 

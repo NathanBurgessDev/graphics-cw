@@ -76,10 +76,29 @@ GLuint loadCubeMap(std::vector<std::string> faces) {
 	return textureID;
 }
 
-unsigned char* getHeightMap(std::string filePath, int& width, int& height, int& numChannels) {
+std::vector<std::vector<unsigned char>> getHeightMapAs2DArray(std::string filePath, int& width, int& height, int& numChannels) {
+	// Load image data
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &numChannels, 0);
-	return data;
+	if (!data) {
+		std::cerr << "Failed to load image: " << filePath << std::endl;
+		return {};
+	}
+
+	// Create a 2D array
+	std::vector<std::vector<unsigned char>> image(height, std::vector<unsigned char>(width * numChannels));
+
+	// Copy image data to 2D array
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width * numChannels; ++x) {
+			image[y][x] = data[y * width * numChannels + x];
+		}
+	}
+
+	// Free the image memory
+	stbi_image_free(data);
+
+	return image;
 }
 
 void freeImage(unsigned char* data) {

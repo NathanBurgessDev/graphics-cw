@@ -74,5 +74,5 @@
 
 GLuint CreateTexture(const char* filename);
 GLuint loadCubeMap(std::vector<std::string> faces);
-unsigned char* getHeightMap(std::string filePath, int& width, int& height, int& numChannels);
+std::vector<std::vector<unsigned char>> getHeightMapAs2DArray(std::string filePath, int& width, int& height, int& numChannels);
 void freeImage(unsigned char*);
