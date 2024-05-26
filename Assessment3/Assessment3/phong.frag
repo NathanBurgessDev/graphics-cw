@@ -26,7 +26,7 @@ uniform vec3 lightPos;
 uniform vec3 camPos;
 
 vec3 calculateDiffuse(vec3 Nnor,vec3 NToLight);
-vec3 calculateSpecular(vec3 NrefLight, vec3 NcamDirection);
+vec3 calculateSpecular(vec3 NrefLight, vec3 NcamDirection, vec3 Nnor);
 float calculateAttenuation();
 
 vec3 CalculateDirectionIllumination(vec3 colour, vec3 Nnor);
@@ -46,15 +46,19 @@ void main()
 }
 
 vec3 calculateDiffuse(vec3 Nnor, vec3 NToLight){
+
 	float diff = max(dot(Nnor, NToLight), 0);
 
 	return vec3((diff * diffIn) * lDiff);
 }
 
-vec3 calculateSpecular(vec3 NrefLight, vec3 NcamDirection){
+vec3 calculateSpecular(vec3 NrefLight, vec3 NcamDirection, vec3 Nnor){
 
-
-	float spec = pow(max(dot(NcamDirection, NrefLight), 0), specHigh);
+	vec3 lightDir = normalize(lightPos - FragPosWorldSpace);
+	vec3 viewDir = normalize(camPos - FragPosWorldSpace);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+		
+	float spec = pow(max(dot(Nnor, halfwayDir), 0), specHigh);
 	return vec3((spec * specIn )* lSpec);
 }
 
@@ -80,7 +84,7 @@ vec3 CalculateDirectionIllumination(vec3 colour, vec3 Nnor) {
 	vec3 camDirection = camPos - FragPosWorldSpace;
 	vec3 NcamDirection = normalize(camDirection);
 
-	vec3 specular = calculateSpecular(NrefLight,NcamDirection);
+	vec3 specular = calculateSpecular(NrefLight,NcamDirection, Nnor);
 
 	float shadow = shadowOnFragment(FragPosProjectedLightSpace);
 	vec3 phong = (ambient + (1.f - shadow) * (diffuse + specular)) * colour;
@@ -104,10 +108,9 @@ vec3 CalculatePositionalIllumination(vec3 colour) {
 	vec3 camDirection = camPos - FragPosWorldSpace;
 	vec3 NcamDirection = normalize(camDirection);
 
-
 	// Specular 
 	// Should be set by uniform
-	vec3 specular = calculateSpecular(NrefLight, NcamDirection);
+	vec3 specular = calculateSpecular(NrefLight, NcamDirection, Nnor);
 
 	// Attenuation
 	float attenuation = calculateAttenuation();
@@ -132,7 +135,7 @@ vec3 CalculateSpotIllumination(vec3 colour) {
 	vec3 NcamDirection = normalize(camDirection);
 
 
-	vec3 specular = calculateSpecular(NrefLight, NcamDirection);
+	vec3 specular = calculateSpecular(NrefLight, NcamDirection, Nnor);
 
 	float attenuation = calculateAttenuation();
 
