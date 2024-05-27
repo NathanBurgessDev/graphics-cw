@@ -2,12 +2,15 @@
 
 #include <stdio.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 enum Camera_Movement {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	SPEEDUP,
+	SPEEDDOWN
 };
 
 const float YAW = -90.0f;
@@ -38,5 +41,6 @@ public:
 	void UpdateCamera();
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset);
+	glm::mat4 GetViewMatrix();
 };
 

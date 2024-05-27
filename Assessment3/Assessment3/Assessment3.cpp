@@ -42,7 +42,7 @@ bool firstMouse = true;
 
 
 glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
-glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
+
 
 
 
@@ -75,6 +75,13 @@ void processKeyboard(GLFWwindow* window)
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.ProcessKeyboard(SPEEDUP, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		camera.ProcessKeyboard(SPEEDDOWN, deltaTime);
+
+
+
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
@@ -210,16 +217,18 @@ int main()
 		}
 		processKeyboard(window);
 
-		float near_plane = 1.f;
+		float near_plane = .1f;
 		float far_plane = 75.5f;
-
-
 		// ~~~~~~~ Generate ShadowDepthMap ~~~~~~~~~~
-
-		glm::mat4 lightProjection = glm::ortho(-10.f, 10.f, -10.f, 10.f, near_plane, far_plane);
+		
+		//glm::mat4 sunPos = glm::vec4(camera.Position,1.f);
+		
+		//glm::translate(&(sunPos), glm::vec3(2.f, 6.f, 7.f));
+		glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
+		//lightPos = lightPos + camera.Position;
+		glm::mat4 lightProjection = glm::ortho(-100.f, 100.f, -100.f, 100.f	, near_plane, far_plane);
 		glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDirection, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 projectedLightSpaceMatrix = lightProjection * lightView;
-
 		shadowRenderer.generateDepthMap(shadowProgram, objs, projectedLightSpaceMatrix);
 		//shadowRenderer.saveShadowMap();
 		
@@ -238,7 +247,7 @@ int main()
 		glm::mat4 projection = glm::mat4(1.f);
 
 		view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
-		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 300.f);
+		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 500.f);
 
 		skyBox.RenderSkyBox(view,projection);
 

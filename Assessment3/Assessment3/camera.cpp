@@ -27,6 +27,11 @@ void SCamera::UpdateCamera()
 	Up = glm::normalize(glm::cross(Right, Front));
 }
 
+glm::mat4 SCamera::GetViewMatrix()
+{
+    return glm::lookAt(Position, Position + Front, Up);
+}
+
 void SCamera::ProcessMouseMovement(float xoffset, float yoffset)
 {
     xoffset *= MouseSensitivity;
@@ -58,4 +63,8 @@ void SCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
         Position -= Right * velocity;
     if (direction == RIGHT)
         Position += Right * velocity;
+    if (direction == SPEEDUP)
+        MovementSpeed += 0.5f;
+    if (direction == SPEEDDOWN)
+        MovementSpeed -= 0.5f;
 }

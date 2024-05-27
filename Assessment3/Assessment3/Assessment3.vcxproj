@@ -138,6 +138,7 @@
     <ClCompile Include="bitmap.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CompleteObject.cpp" />
+    <ClCompile Include="F22.cpp" />
     <ClCompile Include="obj.cpp" />
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="ShadowRendering.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="CompleteObject.h" />
+    <ClInclude Include="F22.h" />
     <ClInclude Include="obj.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shadow.h" />
