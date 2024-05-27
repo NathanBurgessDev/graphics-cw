@@ -1,38 +1,61 @@
 #include "camera.h"
 
 
-void InitCamera(SCamera& in)
+SCamera::SCamera(glm::vec3 position,
+	float yaw, float pitch)
 {
-	in.Front = glm::vec3(0.0f, 0.0f, -1.0f);
-	in.Position = glm::vec3(0.0f, 0.0f, 0.0f);
-	in.Up = glm::vec3(0.0f, 1.0f, 0.0f);
-	in.WorldUp = in.Up;
-	in.Right = glm::normalize(glm::cross(in.Front, in.WorldUp));
+	Front = glm::vec3(0.0f, 0.0f, -1.0f);
+	Position = position;
+	Up = glm::vec3(0.0f, 1.0f, 0.0f);
+	WorldUp = Up;
+	Right = glm::normalize(glm::cross(Front, WorldUp));
 
-	in.Yaw = -90.f;
-	in.Pitch = 0.f;
+	Yaw = -90.f;
+	Pitch = 0.f;
 }
 
 
-void MoveAndOrientCamera(SCamera& in, glm::vec3 target, float distance, float xoffset, float yoffset)
+void SCamera::UpdateCamera()
 {
-	in.Yaw -= xoffset * in.MovementSpeed;
-	in.Pitch -= yoffset * in.MovementSpeed;
+	glm::vec3 front;
+	front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+	front.y = sin(glm::radians(Pitch));
+	front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+	Front = glm::normalize(front);
 
-	if (in.Pitch > 89.0f)
-		in.Pitch = 89.0f;
-	if (in.Pitch < -89.9f)
-		in.Pitch = -89.0f;
+	Right = glm::normalize(glm::cross(Front, WorldUp));
+	Up = glm::normalize(glm::cross(Right, Front));
+}
 
-	float px = cos(glm::radians(in.Yaw)) * cos(glm::radians(in.Pitch));
-	float py = sin(glm::radians(in.Pitch));
-	float pz = sin(glm::radians(in.Yaw)) * cos(glm::radians(in.Pitch));
+void SCamera::ProcessMouseMovement(float xoffset, float yoffset)
+{
+    xoffset *= MouseSensitivity;
+    yoffset *= MouseSensitivity;
 
-	in.Position = glm::vec3(px, py, pz) * in.cam_dist;
+    Yaw += xoffset;
+    Pitch += yoffset;
 
-	in.Front = glm::normalize(target - in.Position);
+    
+    
+    if (Pitch > 89.0f)
+        Pitch = 89.0f;
+    if (Pitch < -89.0f)
+        Pitch = -89.0f;
+    
 
-	in.Right = glm::normalize(glm::cross(in.Front, in.WorldUp));
+    // update Front, Right and Up Vectors using the updated Euler angles
+	UpdateCamera();
+}
 
-	in.Up = glm::normalize(glm::cross(in.Right, in.Front));
+void SCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
+{
+    float velocity = MovementSpeed * deltaTime;
+    if (direction == FORWARD)
+        Position += Front * velocity;
+    if (direction == BACKWARD)
+        Position -= Front * velocity;
+    if (direction == LEFT)
+        Position -= Right * velocity;
+    if (direction == RIGHT)
+        Position += Right * velocity;
 }

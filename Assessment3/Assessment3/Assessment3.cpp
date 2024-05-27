@@ -30,8 +30,16 @@ int height = 800;
 
 unsigned int floorVAO;
 unsigned int floorVBO;
+// Timing stuff
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
-SCamera Camera;
+// Camera stuff
+SCamera camera = SCamera();
+float lastX = width / 2.0f;
+float lastY = height / 2.0f;
+bool firstMouse = true;
+
 
 glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
 glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
@@ -43,6 +51,9 @@ void SizeCallback(GLFWwindow* window, int w, int h)
 	glViewport(0, 0, w, h);
 	width = w;
 	height = h;
+	lastX = width / 2.0f;
+	lastY = height / 2.0f;
+
 
 	ShadowRendering* shadowRenderer = static_cast<ShadowRendering*>(glfwGetWindowUserPointer(window));
 	shadowRenderer->height = h;
@@ -55,60 +66,36 @@ void processKeyboard(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	float xOffset = 0;
-	float yOffset = 0;
-	bool camChanged = false;
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+	float xpos = static_cast<float>(xposIn);
+	float ypos = static_cast<float>(yposIn);
+
+	if (firstMouse)
 	{
-		xOffset = 1;
-		yOffset = 0;
-		camChanged = true;
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-	{
-		xOffset = -1;
-		yOffset = 0;
-		camChanged = true;
-	}
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-	{
-		xOffset = 0;
-		yOffset = 1;
-		camChanged = true;
-	}
+	lastX = xpos;
+	lastY = ypos;
 
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-	{
-		xOffset = 0;
-		yOffset = -1;
-		camChanged = true;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-	{
-		Camera.cam_dist -= 0.1;
-		camChanged = true;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-	{
-		Camera.cam_dist += 0.1;
-		camChanged = true;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		lightDirection = Camera.Front;
-		lightPos = Camera.Position;
-	}
-
-	if (camChanged)
-	{
-		MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), Camera.cam_dist, xOffset, yOffset);
-	}
+	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 
@@ -122,6 +109,8 @@ int main()
 	// Setup window + callbacks
 	GLFWwindow* window = glfwCreateWindow(width, height, "Assesment 3", NULL, NULL);
 	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetWindowSizeCallback(window, SizeCallback);
 
 
@@ -146,9 +135,8 @@ int main()
 	
 
 
-	InitCamera(Camera);
-	Camera.cam_dist = 5.f;
-	MoveAndOrientCamera(Camera, glm::vec3(0, 0, 0), Camera.cam_dist, 0.f, 0.f);
+	
+	camera.cam_dist = 5.f;
 
 	SkyBox skyBox = SkyBox(skyBoxProgram);
 
@@ -200,11 +188,15 @@ int main()
 
 	//glUseProgram(textureShaderProgram);
 
+
 	while (!glfwWindowShouldClose(window))
 	{
 		 
 		currentTime = glfwGetTime();
+		deltaTime = static_cast<float>(currentTime) - lastFrame;
 		timeDiff = currentTime - prevTime;
+
+		lastFrame = static_cast<float>(currentTime);
 		counter++;
 		if (timeDiff >= 1.0 / 30.0) {
 			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
@@ -245,8 +237,8 @@ int main()
 		glm::mat4 view = glm::mat4(1.f);
 		glm::mat4 projection = glm::mat4(1.f);
 
-		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
-		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
+		view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
+		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 300.f);
 
 		skyBox.RenderSkyBox(view,projection);
 
@@ -275,7 +267,7 @@ int main()
 		glUniform3f(glGetUniformLocation(phongProgram, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
 		glUniform3f(glGetUniformLocation(phongProgram, "lightColour"), 1, 1, 1);
 		glUniform3f(glGetUniformLocation(phongProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(glGetUniformLocation(phongProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
+		glUniform3f(glGetUniformLocation(phongProgram, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 
 		glm::vec3 lightColour = glm::vec3(1.f, 1.f, 1.f);
 		glm::vec3 diffColour = lightColour * glm::vec3(1.f);
@@ -285,11 +277,11 @@ int main()
 		glUniform3fv(glGetUniformLocation(phongProgram, "lightDiff"),1,glm::value_ptr(diffColour));
 		glUniform3f(glGetUniformLocation(phongProgram, "lightSpec"), 1.f, 1.f, 1.f);
 
-		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
+		//view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
 
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
+		//projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 
@@ -300,22 +292,23 @@ int main()
 		glUniform3f(glGetUniformLocation(heightMapProgram, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
 		glUniform3f(glGetUniformLocation(heightMapProgram, "lightColour"), 1, 1, 1);
 		glUniform3f(glGetUniformLocation(heightMapProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(glGetUniformLocation(heightMapProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
+		glUniform3f(glGetUniformLocation(heightMapProgram, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	
-		view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
+		//view = glm::lookAt(Camera.Position, Camera.Position + Camera.Front, Camera.Up);
 
 		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-		projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
+		//projection = glm::perspective(glm::radians(45.f), (float)width / (float)height, .01f, 100.f);
 
 		glUniformMatrix4fv(glGetUniformLocation(heightMapProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-
+		//glEnable(GL_FRAMEBUFFER_SRGB);
 
 		for (std::unique_ptr<CompleteObject>& obj: objs) {
 			obj->renderFullObject(shadowRenderer.shadowMap.Texture);
 		}
 
+		//glDisable(GL_FRAMEBUFFER_SRGB);
 		
 
 		glfwSwapBuffers(window);
