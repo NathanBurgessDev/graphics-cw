@@ -12,12 +12,23 @@ CompleteObject::CompleteObject(GLuint shaderProgram, const char* filename) {
 	}
 }
 
+
+
 CompleteObject::CompleteObject(GLuint shaderProgram) {
 	this->shaderProgram = shaderProgram;
 };
 
+glm::mat4 CompleteObject::calcMovement() {
+	glm::mat4 tempModel = *model;
+	tempModel = glm::translate(tempModel, pos);
+	tempModel = glm::scale(tempModel, scale);
+	return tempModel;
+}
+
 void CompleteObject::renderFullObject(GLuint shadowTexture) {
 	glUseProgram(shaderProgram);
+	glm::mat4 modelCopy = *model;
+	*model = calcMovement();
 	GLuint shadowMapPos = glGetUniformLocation(shaderProgram, "shadowMap");
 	glUniform1i(shadowMapPos, 1);
 	glActiveTexture(GL_TEXTURE1);
@@ -25,18 +36,34 @@ void CompleteObject::renderFullObject(GLuint shadowTexture) {
  	for (Object& obj : objs) {
 		obj.renderObject(shaderProgram);		
 	}
+	*model = modelCopy;
+}
+
+void CompleteObject::stackPosition(glm::vec3 translation) {
+	this->pos += translation;
+}
+
+void CompleteObject::setStackPosition(glm::vec3 translation) {
+	this->pos = translation;
 }
 
 void CompleteObject::renderFullObjectWithShader(GLuint newShaderProgram){
+	glm::mat4 modelCopy = *model;
+	*model = calcMovement();
 	for (Object& obj : objs) {
 		obj.renderShadowObject(newShaderProgram);
 	}
+	*model = modelCopy;
 }
 
-void CompleteObject::translate(float x, float y, float z) {
+void CompleteObject::setPos(float x, float y, float z) {
 	*model = glm::translate((*model), glm::vec3(x, y, z));
 }
 
-void CompleteObject::scale(float x, float y, float z) {
+void CompleteObject::setScale(float x, float y, float z) {
 	*model = glm::scale((*model), glm::vec3(x, y, z));
+}
+
+void CompleteObject::handleMovement(float currentTime, float deltaTime) {
+
 }

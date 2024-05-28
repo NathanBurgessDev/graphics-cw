@@ -137,6 +137,7 @@
     <ClCompile Include="Assessment3.cpp" />
     <ClCompile Include="bitmap.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="castelijau.cpp" />
     <ClCompile Include="CompleteObject.cpp" />
     <ClCompile Include="F22.cpp" />
     <ClCompile Include="obj.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="castelijau.h" />
     <ClInclude Include="CompleteObject.h" />
     <ClInclude Include="F22.h" />
     <ClInclude Include="obj.h" />

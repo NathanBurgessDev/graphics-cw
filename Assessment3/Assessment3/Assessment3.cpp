@@ -22,6 +22,7 @@ using namespace std;
 #include "Terrain.h"
 #include "ShadowRendering.h"
 #include "Tree.h"
+#include "F22.h"
 #include "SkyBox.h"
 
 
@@ -151,18 +152,19 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	std::unique_ptr<Tree> tree0 = std::make_unique<Tree>(phongProgram,"objs/white_oak/white_oak.obj");
-	tree0->translate(0.f, 2.f, 0.0f);
-	tree0->scale(0.005f, 0.005f, 0.005f);
+	tree0->setPos(0.f, 2.f, 0.0f);
+	tree0->setScale(0.005f, 0.005f, 0.005f);
 
 	std::unique_ptr<Tree> tree1 = std::make_unique<Tree>(phongProgram, "objs/white_oak/white_oak.obj");
-	tree1->translate(5.0f, 2.f, 0.0f);
-	tree1->scale(0.005f, 0.005f, 0.005f);
+	tree1->setPos(5.0f, 2.f, 0.0f);
+	tree1->setScale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
 
-	std::unique_ptr<CompleteObject> f22 = std::make_unique<CompleteObject>(phongProgram, "objs/f22/F-22.obj");
-	f22->translate(-8.f, 5.f, 0.f);
-	f22->scale(0.05f, 0.05f, 0.05f);
+	std::unique_ptr<F22> f22 = std::make_unique<F22>(phongProgram, "objs/f22/F-22.obj");
+	f22->setupCtrlPoints();
+	f22->setPos(-8.f, 0.f, 0.f);
+	f22->scale = glm::vec3(0.05f, 0.05f, 0.05f);
 
 
 	std::unique_ptr<Terrain> ground= std::make_unique<Terrain>(heightMapProgram, 100,100, 40,1.0);
@@ -216,6 +218,12 @@ int main()
 
 		}
 		processKeyboard(window);
+
+		// Update Movement of Objects
+
+		for (std::unique_ptr<CompleteObject>& obj : objs) {
+			obj->handleMovement(currentTime,deltaTime);
+		}
 
 		float near_plane = .1f;
 		float far_plane = 75.5f;

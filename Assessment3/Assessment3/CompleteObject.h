@@ -10,6 +10,8 @@ public:
 	vector<Object> objs;
 	std::shared_ptr<glm::mat4> model;
 	GLuint shaderProgram;
+	glm::vec3 pos = glm::vec3(0,0,0);
+	glm::vec3 scale = glm::vec3(1, 1, 1);
 
 	CompleteObject(GLuint shaderProgram, const char* filename);
 	CompleteObject(GLuint shaderProgram);
@@ -18,8 +20,14 @@ public:
 	virtual void renderFullObject(GLuint shadowTexture);
 	virtual void renderFullObjectWithShader(GLuint newShaderProgram);
 
-	void translate(float x, float y, float z);
+	virtual void handleMovement(float currentTime, float deltaTime);
 
-	void scale(float x, float y, float z);
+	glm::mat4 calcMovement();
+	void stackPosition(glm::vec3 translation);
+	void setStackPosition(glm::vec3 translation);
+
+	void setPos(float x, float y, float z);
+
+	void setScale(float x, float y, float z);
 
 };
