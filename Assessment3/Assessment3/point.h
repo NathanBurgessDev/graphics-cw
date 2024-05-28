@@ -28,12 +28,27 @@ public:
 		p.z = rhs.z * lhs;
 		return p;
 	}
+	friend point operator*(point lhs,float rhs)
+	{
+		point p;
+		p.x = lhs.x * rhs;
+		p.y = lhs.y * rhs;
+		p.z = lhs.z * rhs;
+		return p;
+	}
 	friend point operator+(point lhs, point rhs)
 	{
 		point p;
 		p.x = rhs.x + lhs.x;
 		p.y = rhs.y + lhs.y;
 		p.z = rhs.z + lhs.z;
+		return p;
+	}
+	friend point operator-(point lhs, point rhs) {
+		point p;
+		p.x = lhs.x - rhs.x;
+		p.y = lhs.y - rhs.y;
+		p.z = lhs.z - rhs.z;
 		return p;
 	}
 };

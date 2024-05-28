@@ -169,6 +169,7 @@
     <ClInclude Include="CompleteObject.h" />
     <ClInclude Include="F22.h" />
     <ClInclude Include="obj.h" />
+    <ClInclude Include="point.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shadow.h" />
     <ClInclude Include="ShadowRendering.h" />

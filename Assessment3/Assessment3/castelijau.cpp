@@ -23,11 +23,24 @@ point evaluate(float t, std::vector<point> P)
 				++p1;
 				++p2;
 			}
+
 		} while (p2 != Q.end());
 		Q.clear();
-		Q = R;
+ 		Q = R;
 	}
 	return Q.front();
+}
+
+point evaluateDerivative(float t, const std::vector<point>& P) {
+	std::vector<point> dP;
+	int n = P.size() - 1;
+
+	for (int i = 0; i < n; ++i) {
+		point dp = (P[i + 1] - P[i]) * float(n);
+		dP.push_back(dp);
+	}
+
+	return evaluate(t, dP);
 }
 
 std::vector<point> EvaluateBezierCurve(std::vector<point>ctrl_points, int num_evaluations)

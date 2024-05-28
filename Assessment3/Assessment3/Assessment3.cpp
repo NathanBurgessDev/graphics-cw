@@ -41,6 +41,8 @@ float lastX = width / 2.0f;
 float lastY = height / 2.0f;
 bool firstMouse = true;
 
+bool debug = true;
+
 
 glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
 
@@ -134,7 +136,7 @@ int main()
 	
 
 	//GLuint textureShaderProgram = CompileShader("textured.vert", "textured.frag");
-	//GLuint basicShaderProgram = CompileShader("basic.vert", "basic.frag");
+	GLuint basicShaderProgram = CompileShader("basic.vert", "basic.frag");
 	GLuint phongProgram = CompileShader("phong.vert", "phong.frag");
 	GLuint shadowProgram = CompileShader("shadow.vert", "shadow.frag");
 	GLuint skyBoxProgram = CompileShader("skybox.vert", "skybox.frag");
@@ -148,31 +150,32 @@ int main()
 
 	SkyBox skyBox = SkyBox(skyBoxProgram);
 
-	vector<std::unique_ptr<CompleteObject>> objs;
+	vector<std::shared_ptr<CompleteObject>> objs;
 	glEnable(GL_DEPTH_TEST);
 
-	std::unique_ptr<Tree> tree0 = std::make_unique<Tree>(phongProgram,"objs/white_oak/white_oak.obj");
+	std::shared_ptr<Tree> tree0 = std::make_unique<Tree>(phongProgram,"objs/white_oak/white_oak.obj");
 	tree0->setPos(0.f, 2.f, 0.0f);
 	tree0->setScale(0.005f, 0.005f, 0.005f);
 
-	std::unique_ptr<Tree> tree1 = std::make_unique<Tree>(phongProgram, "objs/white_oak/white_oak.obj");
+	std::shared_ptr<Tree> tree1 = std::make_unique<Tree>(phongProgram, "objs/white_oak/white_oak.obj");
 	tree1->setPos(5.0f, 2.f, 0.0f);
 	tree1->setScale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
 
-	std::unique_ptr<F22> f22 = std::make_unique<F22>(phongProgram, "objs/f22/F-22.obj");
+	std::shared_ptr<F22> f22 = std::make_unique<F22>(phongProgram, "objs/f22/F-22.obj");
 	f22->setupCtrlPoints();
-	f22->setPos(-8.f, 0.f, 0.f);
+	f22->setupLineRender();
+	f22->setPos(0.f, 2.f, 0.f);
 	f22->scale = glm::vec3(0.05f, 0.05f, 0.05f);
 
 
-	std::unique_ptr<Terrain> ground= std::make_unique<Terrain>(heightMapProgram, 100,100, 40,1.0);
+	std::shared_ptr<Terrain> ground= std::make_unique<Terrain>(heightMapProgram, 100,100, 40,1.0);
 	
-	objs.push_back(std::move(ground));
-	objs.push_back(std::move(f22));
- 	objs.push_back(std::move(tree0));
-	objs.push_back(std::move(tree1));
+	objs.push_back(ground);
+	objs.push_back(f22);
+ 	objs.push_back(tree0);
+	objs.push_back(tree1);
 	
 	
 
@@ -221,7 +224,7 @@ int main()
 
 		// Update Movement of Objects
 
-		for (std::unique_ptr<CompleteObject>& obj : objs) {
+		for (std::shared_ptr<CompleteObject>& obj : objs) {
 			obj->handleMovement(currentTime,deltaTime);
 		}
 
@@ -232,7 +235,7 @@ int main()
 		//glm::mat4 sunPos = glm::vec4(camera.Position,1.f);
 		
 		//glm::translate(&(sunPos), glm::vec3(2.f, 6.f, 7.f));
-		glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
+		glm::vec3 lightPos = glm::vec3(-10.f, 6.f, 7.f);
 		//lightPos = lightPos + camera.Position;
 		glm::mat4 lightProjection = glm::ortho(-100.f, 100.f, -100.f, 100.f	, near_plane, far_plane);
 		glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDirection, glm::vec3(0.f, 1.f, 0.f));
@@ -321,12 +324,25 @@ int main()
 
 		//glEnable(GL_FRAMEBUFFER_SRGB);
 
-		for (std::unique_ptr<CompleteObject>& obj: objs) {
+		for (std::shared_ptr<CompleteObject>& obj: objs) {
 			obj->renderFullObject(shadowRenderer.shadowMap.Texture);
 		}
 
 		//glDisable(GL_FRAMEBUFFER_SRGB);
 		
+		if (debug) {
+			glUseProgram(basicShaderProgram);
+			glm::mat4 lineModel = glm::mat4(1.f);
+			glUniformMatrix4fv(glGetUniformLocation(basicShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(lineModel));
+
+			glUniformMatrix4fv(glGetUniformLocation(basicShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+			glUniformMatrix4fv(glGetUniformLocation(basicShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+			f22->renderLines();
+		}
+
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

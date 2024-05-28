@@ -20,8 +20,24 @@ CompleteObject::CompleteObject(GLuint shaderProgram) {
 
 glm::mat4 CompleteObject::calcMovement() {
 	glm::mat4 tempModel = *model;
-	tempModel = glm::translate(tempModel, pos);
+	//tempModel = glm::translate(tempModel, pos);
+	if (directionVector.has_value()) {
+
+		up = glm::vec3(0.f, 1.f, 0.f);
+		right = glm::normalize(glm::cross(up, directionVector.value()));
+		up = glm::cross(directionVector.value(), right);
+
+		glm::mat4 rotationMatrix = glm::mat4(1.0f);
+		rotationMatrix[0] = glm::vec4(right, 0.0f);
+		rotationMatrix[1] = glm::vec4(up, 0.0f);
+		rotationMatrix[2] = glm::vec4(directionVector.value(), 0.0f);
+
+		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), pos);
+
+		tempModel = translationMatrix * (rotationMatrix);
+	}
 	tempModel = glm::scale(tempModel, scale);
+
 	return tempModel;
 }
 
@@ -67,3 +83,4 @@ void CompleteObject::setScale(float x, float y, float z) {
 void CompleteObject::handleMovement(float currentTime, float deltaTime) {
 
 }
+

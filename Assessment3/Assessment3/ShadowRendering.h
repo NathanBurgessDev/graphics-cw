@@ -27,7 +27,7 @@ public:
 	ShadowStruct shadowMap = setup_shadowmap(sh_map_width, sh_map_height);
 
 	ShadowRendering(int width, int height);
-	void generateDepthMap(unsigned int shadowShaderProgram, vector<std::unique_ptr<CompleteObject>>& objs,
+	void generateDepthMap(unsigned int shadowShaderProgram, vector<std::shared_ptr<CompleteObject>>& objs,
 		glm::mat4 projectedLightSpaceMatrix);
 	void saveShadowMap();
 };
