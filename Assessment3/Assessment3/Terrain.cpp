@@ -10,7 +10,7 @@ void Terrain::constructHeightMapTerrain(GLuint shaderProgram, float resolution, 
 	this->shaderProgram = shaderProgram;
 	model = std::make_shared<glm::mat4>(1.f);
 	this->texture = CreateTexture("objs/floor/grassTexture.png");
-	std::vector<std::vector<unsigned char>> png = getHeightMapAs2DArray("objs/floor/heightMap2Small.png", width, height, numChannels);
+	std::vector<std::vector<unsigned char>> png = getHeightMapAs2DArray("objs/floor/heightMap2Small1.png", width, height, numChannels);
 	if (!png.empty())
 	{
 		std::cout << "Loaded heightmap of size " << height << " x " << width << std::endl;

@@ -22,8 +22,8 @@ class ShadowRendering
 public:
 	int width;
 	int height;
-	int sh_map_width = 2048;
-	int sh_map_height = 2048;
+	int sh_map_width = 4096;
+	int sh_map_height = 4096;
 	ShadowStruct shadowMap = setup_shadowmap(sh_map_width, sh_map_height);
 
 	ShadowRendering(int width, int height);

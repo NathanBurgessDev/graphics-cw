@@ -44,7 +44,7 @@ bool firstMouse = true;
 bool debug = true;
 
 
-glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
+glm::vec3 lightDirection = glm::vec3(0.1f, -.61f, -.1f);
 
 
 
@@ -82,9 +82,8 @@ void processKeyboard(GLFWwindow* window)
 		camera.ProcessKeyboard(SPEEDUP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 		camera.ProcessKeyboard(SPEEDDOWN, deltaTime);
-
-
-
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS )
+		debug = !debug;
 }
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
@@ -154,11 +153,11 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	std::shared_ptr<Tree> tree0 = std::make_unique<Tree>(phongProgram,"objs/white_oak/white_oak.obj");
-	tree0->setPos(0.f, 2.f, 0.0f);
+	tree0->setPos(0.f, -20.2f, 0.0f);
 	tree0->setScale(0.005f, 0.005f, 0.005f);
 
 	std::shared_ptr<Tree> tree1 = std::make_unique<Tree>(phongProgram, "objs/white_oak/white_oak.obj");
-	tree1->setPos(5.0f, 2.f, 0.0f);
+	tree1->setPos(5.0f, -20.1f, 0.0f);
 	tree1->setScale(0.005f, 0.005f, 0.005f);
 	
 	//Terrain ground
@@ -171,13 +170,15 @@ int main()
 
 
 	std::shared_ptr<Terrain> ground= std::make_unique<Terrain>(heightMapProgram, 100,100, 40,1.0);
-	
+
 	objs.push_back(ground);
 	objs.push_back(f22);
  	objs.push_back(tree0);
 	objs.push_back(tree1);
 	
-	
+	std::cout << "WASD to move" << std::endl;
+	std::cout << "B for Debug" << std::endl;
+	std::cout << "ESC to exit" << std::endl;
 
 	ShadowRendering shadowRenderer = ShadowRendering(width, height);
 	glfwSetWindowUserPointer(window, &shadowRenderer);
@@ -228,16 +229,16 @@ int main()
 			obj->handleMovement(currentTime,deltaTime);
 		}
 
-		float near_plane = .1f;
-		float far_plane = 75.5f;
+		float near_plane = .0001f;
+		float far_plane = 75.f;
 		// ~~~~~~~ Generate ShadowDepthMap ~~~~~~~~~~
 		
 		//glm::mat4 sunPos = glm::vec4(camera.Position,1.f);
 		
 		//glm::translate(&(sunPos), glm::vec3(2.f, 6.f, 7.f));
-		glm::vec3 lightPos = glm::vec3(-10.f, 6.f, 7.f);
+		glm::vec3 lightPos = glm::vec3(10.f, 6.f, 40.f);
 		//lightPos = lightPos + camera.Position;
-		glm::mat4 lightProjection = glm::ortho(-100.f, 100.f, -100.f, 100.f	, near_plane, far_plane);
+		glm::mat4 lightProjection = glm::ortho(-100.f, 50.f, -50.f, 150.f, near_plane, far_plane);
 		glm::mat4 lightView = glm::lookAt(lightPos, lightPos + lightDirection, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 projectedLightSpaceMatrix = lightProjection * lightView;
 		shadowRenderer.generateDepthMap(shadowProgram, objs, projectedLightSpaceMatrix);
@@ -264,23 +265,6 @@ int main()
 
 
 		glUseProgram(phongProgram);
-
-	/*	GLuint shadowPosPhong = glGetUniformLocation(phongProgram, "shadowMap");
-		GLuint shadowPosTerrain = glGetUniformLocation(heightMapProgram, "shadowMap");
-
-		glUniform1i(shadowPosPhong, 1);
-		glUniform1i(shadowPosTerrain, 2);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, shadowRenderer.shadowMap.Texture);
-
-		glUseProgram(heightMapProgram);
-
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, shadowRenderer.shadowMap.Texture);
-
-		glUseProgram(phongProgram);*/
-
 
 		
 		glUniformMatrix4fv(glGetUniformLocation(phongProgram, "projectedLightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(projectedLightSpaceMatrix));
