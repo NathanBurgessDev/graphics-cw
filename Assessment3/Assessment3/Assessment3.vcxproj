@@ -149,6 +149,7 @@
     <ClCompile Include="Tree.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\.gitignore" />
     <None Include="basic.frag" />
     <None Include="basic.vert" />
     <None Include="heightMap.frag" />

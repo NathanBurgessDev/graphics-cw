@@ -34,16 +34,16 @@ void F22::handleMovement(float currentTime, float deltaTime) {
  	this->pos = glm::vec3(pointPos.x, pointPos.y, pointPos.z);
 	this->directionVector = nTangent;
 
-	std::cout << "Position" << std::endl;
-	std::cout << this->pos.x << std::endl;
-	std::cout << this->pos.y << std::endl;
-	std::cout << this->pos.z << std::endl;
+	//std::cout << "Position" << std::endl;
+	//std::cout << this->pos.x << std::endl;
+	//std::cout << this->pos.y << std::endl;
+	//std::cout << this->pos.z << std::endl;
 
-	std::cout << "Direction" << std::endl;
+	//std::cout << "Direction" << std::endl;
 
-	std::cout << this->directionVector.value().x << std::endl;
-	std::cout << this->directionVector.value().y << std::endl;
-	std::cout << this->directionVector.value().z << std::endl;
+	//std::cout << this->directionVector.value().x << std::endl;
+	//std::cout << this->directionVector.value().y << std::endl;
+	//std::cout << this->directionVector.value().z << std::endl;
 }
 
 void F22::setupLineRender() {
