@@ -1,18 +1,23 @@
 #include "F22.h"
 
 void F22::setupCtrlPoints(){
+	//ctrl_points.push_back(point(0.f, 2.f, 0.f));
+	//ctrl_points.push_back(point(20.f, 2.f, 0.f));
+
+	//ctrl_points.push_back(point(30.f, 5.f, -10.f));
+	//ctrl_points.push_back(point(30.f, 5.f, -30.f));
+
+	//ctrl_points.push_back(point(20.f, 5.f, -40.f));
+	//ctrl_points.push_back(point(0.f, 5.f, -40.f));
+
+	//ctrl_points.push_back(point(-10.f, 2.f, -30.f));
+	//ctrl_points.push_back(point(-10.f, 2.f, -10.f));
+	//ctrl_points.push_back(point(0.f, 2.f, 0.f));
+
 	ctrl_points.push_back(point(0.f, 2.f, 0.f));
-	ctrl_points.push_back(point(20.f, 2.f, 0.f));
-
-	ctrl_points.push_back(point(30.f, 2.f, -10.f));
-	ctrl_points.push_back(point(30.f, 2.f, -30.f));
-
-	ctrl_points.push_back(point(20.f, 2.f, -40.f));
-	ctrl_points.push_back(point(0.f, 2.f, -40.f));
-
-	ctrl_points.push_back(point(-10.f, 2.f, -30.f));
-	ctrl_points.push_back(point(-10.f, 2.f, -10.f));
-	ctrl_points.push_back(point(0.f, 2.f, 0.f));
+	ctrl_points.push_back(point(100.f, 25.f, 50.f));
+	ctrl_points.push_back(point(50.f, 50.f, -200.f));
+	ctrl_points.push_back(point(0.f, -2.f, 50.f));
 }
 
 void F22::handleMovement(float currentTime, float deltaTime) {
@@ -22,7 +27,7 @@ void F22::handleMovement(float currentTime, float deltaTime) {
 	point tangent = evaluateDerivative(modTime, ctrl_points);
 	glm::vec3 tangentVec = glm::vec3(tangent.x, tangent.y, tangent.z);
 	// CRoss product between y down
-	tangentVec = glm::cross(tangentVec, glm::vec3(0, 1, 0));
+	//tangentVec = glm::cross(tangentVec, glm::vec3(0, 1, 0));
 	//float magnitude= glm::length(glm::vec3(tangent.x, tangent.y, tangent.z));
 	glm::vec3 nTangent = glm::normalize(tangentVec);
 	//point futurePointPos = evaluate(modTimeFuture, ctrl_points);

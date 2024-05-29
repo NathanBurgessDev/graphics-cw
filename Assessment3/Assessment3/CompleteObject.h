@@ -14,11 +14,10 @@ public:
 
 	glm::vec3 pos = glm::vec3(0,0,0);
 	glm::vec3 scale = glm::vec3(1, 1, 1);
-	glm::vec3 front = glm::vec3(0, 0, -1);
+	glm::vec3 front = glm::vec3(1, 0, 0);
 	glm::vec3 up = glm::vec3(0, 1, 0);
 	glm::vec3 worldUp = up;
 	glm::vec3 right = glm::normalize(glm::cross(front, worldUp));
-
 	std::optional<glm::vec3> directionVector;
 
 	CompleteObject(GLuint shaderProgram, const char* filename);

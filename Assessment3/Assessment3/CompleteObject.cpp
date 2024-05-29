@@ -34,6 +34,7 @@ glm::mat4 CompleteObject::calcMovement() {
 
 		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), pos);
 
+		//tempModel = glm::rotate(tempModel, glm::radians(90.f), directionVector.value());
 		tempModel = translationMatrix * (rotationMatrix);
 	}
 	tempModel = glm::scale(tempModel, scale);
